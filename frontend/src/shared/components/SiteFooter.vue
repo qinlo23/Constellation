@@ -6,8 +6,7 @@
       </div>
 
       <div class="footer-links">
-        <a href="https://space.bilibili.com/1237791199?spm_id_from=333.1007.0.0" class="footer-link" target="_blank"
-          rel="noreferrer">
+        <a href="https://space.bilibili.com/1237791199?spm_id_from=333.1007.0.0" class="footer-link" target="_blank" rel="noreferrer">
           <el-icon class="link-icon">
             <VideoCamera />
           </el-icon>
@@ -25,14 +24,14 @@
 
       <div class="footer-bottom">
         <span class="footer-info">邮箱：relax271828@petalmail.com</span>
-        <span class="footer-info">设计人：Kite Studio</span>
+        <span class="footer-info">设计人：qinlo</span>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup>
-import { Star, VideoCamera } from '@element-plus/icons-vue'
+import { Star, VideoCamera } from '@element-plus/icons-vue';
 </script>
 
 <style scoped lang="scss">
