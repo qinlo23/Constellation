@@ -1,10 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { setupAppProviders } from './providers'
+import { setupAppPlugins } from '@/core/plugins'
 import { initializeUiTheme } from '@/shared/theme'
 
 initializeUiTheme()
 const app = createApp(App)
 
-setupAppProviders(app)
+setupAppPlugins(app)
 app.mount('#app')

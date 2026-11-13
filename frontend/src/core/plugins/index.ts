@@ -5,7 +5,7 @@ import { createPinia } from 'pinia'
 import router from '@/core/router/index.js'
 import { setupEcharts } from './echarts'
 
-export function setupAppProviders(app: App) {
+export function setupAppPlugins(app: App) {
   const pinia = createPinia()
 
   app.use(pinia)
