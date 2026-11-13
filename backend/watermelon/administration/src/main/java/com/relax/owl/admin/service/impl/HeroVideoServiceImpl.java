@@ -24,10 +24,10 @@ import com.relax.owl.admin.service.HeroVideoService;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultPage;
 import com.relax.owl.common.result.ResultStatus;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 
 /**
  * Hero 视频业务实现。
@@ -113,7 +113,7 @@ public class HeroVideoServiceImpl extends ServiceImpl<HeroVideoMapper, HeroVideo
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增Hero视频", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增Hero视频")
     public int create(HeroVideoDTO dto) {
         validateVideo(dto.getVideo());
         validatePoster(dto.getPoster());
@@ -130,7 +130,7 @@ public class HeroVideoServiceImpl extends ServiceImpl<HeroVideoMapper, HeroVideo
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改Hero视频", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改Hero视频")
     public Boolean update(HeroVideoDTO dto) {
         HeroVideoDO existing = heroVideoMapper.selectById(dto.getId());
         if (existing == null) {
@@ -168,7 +168,7 @@ public class HeroVideoServiceImpl extends ServiceImpl<HeroVideoMapper, HeroVideo
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除Hero视频", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除Hero视频")
     public Boolean deleteById(Long id) {
         HeroVideoDO existing = heroVideoMapper.selectById(id);
         if (existing == null) {
@@ -187,7 +187,7 @@ public class HeroVideoServiceImpl extends ServiceImpl<HeroVideoMapper, HeroVideo
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "启停Hero视频", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "启停Hero视频")
     public Boolean updateStatus(Long id, Integer status) {
         HeroVideoDO existing = heroVideoMapper.selectById(id);
         if (existing == null) {

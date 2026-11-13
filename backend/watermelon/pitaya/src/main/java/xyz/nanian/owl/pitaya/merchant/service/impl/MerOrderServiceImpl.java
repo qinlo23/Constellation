@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import xyz.nanian.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import xyz.nanian.owl.pitaya.merchant.mapper.MerOrderMapper;
 import xyz.nanian.owl.pitaya.merchant.service.MerOrderService;
 import xyz.nanian.owl.pitaya.domain.vo.OrderListVO;
@@ -46,7 +46,7 @@ public class MerOrderServiceImpl implements MerOrderService {
      * @return
      */
     @Override
-    @OperationLog(module = "订单", action = "更新订单状态", persist = true)
+    @OperationLog(module = "订单", action = "更新订单状态")
     public Boolean updateOrderStatus(Long orderId, Integer orderStatus) {
 
         Integer intUpdate = merOrderMapper.updateOrder(orderId,orderStatus);
@@ -88,7 +88,7 @@ public class MerOrderServiceImpl implements MerOrderService {
 
         Page<OrderListVO> page = new Page<>(pageNum,pageSize);
         IPage<OrderListVO> result = merOrderMapper.pageOrderList(page,searchedUserId);
-        ResultPage<OrderListVO> resultPage = ResultPage.create(result);
+        ResultPage<OrderListVO> resultPage = com.relax.owl.common.mybatis.MybatisPageConverter.toResultPage(result);
 
         redisTemplate.opsForValue().set(key, resultPage,MERCHANT_ORDER_TIME_OUT, TimeUnit.MINUTES);
 

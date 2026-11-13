@@ -10,7 +10,7 @@ import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import xyz.nanian.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import xyz.nanian.owl.pitaya.consumer.mapper.ConOrderMapper;
 import xyz.nanian.owl.pitaya.consumer.service.ConOrderService;
 import xyz.nanian.owl.pitaya.domain.entity.OrderDO;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.nanian.owl.infra.rabbitmq.constant.RabbitMQConstants.ORDER_QUEUE;
-import static xyz.nanian.owl.infra.rabbitmq.constant.RabbitMQConstants.ORDER_ROUTING_KEY;
+import static xyz.nanian.owl.pitaya.constant.OrderMqConstants.ORDER_QUEUE;
+import static xyz.nanian.owl.pitaya.constant.OrderMqConstants.ORDER_ROUTING_KEY;
 import static xyz.nanian.owl.pitaya.constant.ShopConstant.ORDER_KEY;
 import static xyz.nanian.owl.pitaya.constant.ShopConstant.ORDER_TIME_OUT;
 
@@ -72,7 +72,7 @@ public class ConOrderServiceImpl implements ConOrderService {
      */
     @Override
     @SneakyThrows
-    @OperationLog(module = "订单", action = "新增订单", persist = true)
+    @OperationLog(module = "订单", action = "新增订单")
     public Boolean saveOrder(xyz.nanian.owl.pitaya.domain.dto.OrderDTO orderDTO) {
 
 //        对于不同的来源是怎么处理？
@@ -126,7 +126,7 @@ public class ConOrderServiceImpl implements ConOrderService {
      * @return
      */
     @Override
-    @OperationLog(module = "订单", action = "更新订单", persist = true)
+    @OperationLog(module = "订单", action = "更新订单")
     public Boolean updateOrder(Long orderId, Integer orderStatus) {
 
         Integer intUpdate = conOrderMapper.updateOrder(orderId,orderStatus);
@@ -196,7 +196,7 @@ public class ConOrderServiceImpl implements ConOrderService {
         Page<OrderListVO> page = new  Page<>(pageNum,pageSize);
         IPage<OrderListVO> result = conOrderMapper.pageOrderList(page,userId);
 
-        ResultPage<OrderListVO> resultPage = ResultPage.create(result);
+        ResultPage<OrderListVO> resultPage = com.relax.owl.common.mybatis.MybatisPageConverter.toResultPage(result);
 
 //        写入Redis
         redisTemplate.opsForValue().set(key, resultPage,ORDER_TIME_OUT, TimeUnit.MINUTES);

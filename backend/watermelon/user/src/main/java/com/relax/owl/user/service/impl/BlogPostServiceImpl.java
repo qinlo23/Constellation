@@ -14,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultPage;
 import com.relax.owl.common.result.ResultStatus;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
 import com.relax.owl.user.domain.dto.BlogPostCreateDTO;
 import com.relax.owl.user.domain.dto.BlogPostUpdateDTO;
 import com.relax.owl.user.domain.entity.BlogPostDO;
@@ -93,7 +93,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @OperationLog(module = "博客", action = "创建文章", persist = true)
+    @OperationLog(module = "博客", action = "创建文章")
     public Long create(BlogPostCreateDTO dto, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         BlogPostDO post = new BlogPostDO();
@@ -118,7 +118,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @OperationLog(module = "博客", action = "更新文章", persist = true)
+    @OperationLog(module = "博客", action = "更新文章")
     public Boolean update(Long id, BlogPostUpdateDTO dto, Long userId) {
         BlogPostDO post = blogPostMapper.selectById(id);
         if (post == null || !post.getUserId().equals(userId)) {
@@ -162,7 +162,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    @OperationLog(module = "博客", action = "删除文章", persist = true)
+    @OperationLog(module = "博客", action = "删除文章")
     public Boolean deleteById(Long id, Long userId) {
         BlogPostDO post = blogPostMapper.selectById(id);
         if (post == null || !post.getUserId().equals(userId)) {

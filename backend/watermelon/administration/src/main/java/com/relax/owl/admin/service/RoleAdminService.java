@@ -1,10 +1,8 @@
 package com.relax.owl.admin.service;
 
-import com.baomidou.mybatisplus.spring.service.IService;
 import com.relax.owl.admin.domain.dto.RoleCreateDTO;
 import com.relax.owl.admin.domain.dto.RoleUpdateDTO;
 import com.relax.owl.admin.domain.vo.RoleVO;
-import com.relax.owl.api.domain.entity.RoleDO;
 
 import java.util.List;
 
@@ -16,7 +14,7 @@ import java.util.List;
  * @author slnt23
  * @since 2026-04-13 23:53:18
  */
-public interface RoleAdminService extends IService<RoleDO> {
+public interface RoleAdminService {
 
     List<RoleVO> listAll();
 

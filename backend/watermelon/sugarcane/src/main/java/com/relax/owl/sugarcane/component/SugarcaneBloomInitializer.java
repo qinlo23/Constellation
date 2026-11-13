@@ -3,7 +3,7 @@ package com.relax.owl.sugarcane.component;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import com.relax.owl.infra.bloom.service.BloomFilterService;
+import com.relax.owl.sugarcane.bloom.service.BloomFilterService;
 import com.relax.owl.sugarcane.domain.entity.ItemDO;
 import com.relax.owl.sugarcane.service.ItemService;
 

@@ -3,7 +3,7 @@ package com.relax.owl.sugarcane.service.impl;
 import com.relax.owl.sugarcane.domain.vo.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import com.relax.owl.sugarcane.constant.CacheConstant;
 import com.relax.owl.sugarcane.domain.dto.PriceCompareLocationDTO;
 import com.relax.owl.sugarcane.domain.dto.PriceCompareSourceDTO;

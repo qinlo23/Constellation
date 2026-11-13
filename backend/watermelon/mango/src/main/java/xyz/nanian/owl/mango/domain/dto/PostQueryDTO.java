@@ -3,7 +3,7 @@ package xyz.nanian.owl.mango.domain.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import xyz.nanian.owl.api.domain.dto.PageDTO;
+import com.relax.owl.common.domain.dto.PageDTO;
 
 /**
  * 文章分页列表查询参数

@@ -30,7 +30,7 @@ import com.relax.owl.common.mail.MailMessage;
 import com.relax.owl.common.mail.MailService;
 import com.relax.owl.common.result.ResultStatus;
 import com.relax.owl.common.security.CurrentUserContext;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

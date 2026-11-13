@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import xyz.nanian.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import xyz.nanian.owl.pitaya.domain.entity.CategoryDO;
 import xyz.nanian.owl.pitaya.domain.entity.ProductDO;
 import xyz.nanian.owl.pitaya.consumer.mapper.ProductMapper;
@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
         Page<ProductVO> page = new Page<>(pageNum,pageSize);
         IPage<ProductVO> result = productMapper.pageProduct(page,productName);
 
-        ResultPage<ProductVO> resultPage = ResultPage.create(result);
+        ResultPage<ProductVO> resultPage = com.relax.owl.common.mybatis.MybatisPageConverter.toResultPage(result);
 
 //        写如Redis
         redisTemplate.opsForValue().set(key, resultPage,CONSUME_PRODUCT_TIME_OUT, TimeUnit.MINUTES);

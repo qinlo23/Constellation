@@ -2,7 +2,7 @@
 
 ![一念神魔](.docs/assets/一念神魔.png)
 
-OWL 是一个多业务 Java 后端项目，基于 Spring Boot 4.1 与 Java 25 构建，覆盖用户认证、AI 对话、价格追踪与后台管理。通用能力沉淀在 `common`、`infra`、`log` 等基础模块，业务模块独立演进。
+OWL 是一个多业务 Java 后端项目，基于 Spring Boot 4.1 与 Java 25 构建，覆盖用户认证、AI 对话、价格追踪与后台管理。通用能力沉淀在 `common/` 下的独立公共模块，由 `start` 组装并启动，业务模块独立演进。
 
 ## 技术栈
 
@@ -20,7 +20,7 @@ mvn clean package -DskipTests
 java -jar start/target/start-0.0.1.jar
 ```
 
-启动前需要准备 MySQL、Redis、RabbitMQ、Nacos、MinIO；连接配置默认通过 Nacos 导入。
+启动前需要准备 MySQL、Redis、Nacos、MinIO；当前日志只输出，不依赖 RabbitMQ。连接配置默认通过 Nacos 导入。
 
 ## 文档
 

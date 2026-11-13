@@ -14,10 +14,10 @@ import com.relax.owl.admin.service.SpotlightService;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.relax.owl.common.result.ResultPage;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 
 import java.util.List;
 
@@ -92,7 +92,7 @@ public class SpotlightServiceImpl extends ServiceImpl<SpotlightMapper, Spotlight
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增焦点项目", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增焦点项目")
     public int create(SpotlightDTO dto) {
         SpotlightDO spotlightDO= spotlightConvert.DTOConvertDO(dto);
 //        这里要把照片上传到OSS
@@ -103,7 +103,7 @@ public class SpotlightServiceImpl extends ServiceImpl<SpotlightMapper, Spotlight
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改焦点项目", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改焦点项目")
     public Boolean update(SpotlightDTO dto) {
         SpotlightDO spotlightDO = spotlightConvert.DTOConvertDO(dto);
         spotlightDO.setId(dto.getId());
@@ -116,7 +116,7 @@ public class SpotlightServiceImpl extends ServiceImpl<SpotlightMapper, Spotlight
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除焦点项目", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除焦点项目")
     public Boolean deleteById(Long id) {
         int result = spotlightMapper.deleteById(id);
         return result == 1;

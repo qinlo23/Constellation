@@ -22,7 +22,7 @@
         <!-- 接入依赖链：api → log → infra → common -->
         <dependency>
             <groupId>com.relax</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>common-core</artifactId>
         </dependency>
     </dependencies>
 

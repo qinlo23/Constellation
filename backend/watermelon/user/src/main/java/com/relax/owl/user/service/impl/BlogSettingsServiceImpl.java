@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import com.relax.owl.user.domain.dto.BlogAboutDTO;
 import com.relax.owl.user.domain.dto.BlogEducationDTO;
 import com.relax.owl.user.domain.dto.BlogSettingsDTO;
@@ -87,7 +87,7 @@ public class BlogSettingsServiceImpl implements BlogSettingsService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @OperationLog(module = "博客", action = "更新博客设置", persist = true)
+    @OperationLog(module = "博客", action = "更新博客设置")
     public Boolean update(BlogSettingsDTO dto, Long userId) {
         LocalDateTime now = LocalDateTime.now();
 

@@ -14,8 +14,8 @@ import com.relax.owl.admin.service.FeatureService;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.relax.owl.common.result.ResultPage;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 
 import java.util.List;
 
@@ -76,14 +76,14 @@ public class FeatureServiceImpl extends ServiceImpl<FeatureMapper, FeatureDO> im
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增产品特性", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增产品特性")
     public Integer create(FeatureDTO dto) {
         FeatureDO featureDO=featureConvert.DTOtoEntity(dto);
         return featureMapper.insert(featureDO);
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改产品特性", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改产品特性")
     public Boolean update(FeatureDTO dto) {
         FeatureDO featureDO = featureConvert.DTOtoEntity(dto);
         featureDO.setId(dto.getId());
@@ -93,7 +93,7 @@ public class FeatureServiceImpl extends ServiceImpl<FeatureMapper, FeatureDO> im
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除产品特性", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除产品特性")
     public Boolean deleteById(Long id) {
         int result = featureMapper.deleteById(id);
         return result == 1;

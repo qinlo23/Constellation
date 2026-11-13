@@ -30,7 +30,7 @@ public class ItemController {
     @PostMapping("/page")
     @Operation(summary = "所查物品列表")
     public Result<ResultPage<PriceItemVO>> page(@RequestBody ItemIntroDTO dto){
-        return Result.success(ResultPage.create(itemService.getItemIntroList(dto)));
+        return Result.success(com.relax.owl.common.mybatis.MybatisPageConverter.toResultPage(itemService.getItemIntroList(dto)));
     }
 
     // 删除

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import xyz.nanian.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import xyz.nanian.owl.pitaya.consumer.mapper.ConCartMapper;
 import xyz.nanian.owl.pitaya.consumer.service.ConCartService;
 import xyz.nanian.owl.pitaya.domain.dto.ShoppingCartDTO;
@@ -51,7 +51,7 @@ public class ConCartServiceImpl implements ConCartService {
      * @return
      */
     @Override
-    @OperationLog(module = "购物车", action = "购物车新增商品", persist = true)
+    @OperationLog(module = "购物车", action = "购物车新增商品")
     public Boolean saveProduct(ShoppingCartDTO shoppingCartDTO) {
 
         ShoppingCartDO  shoppingCartDO = shoppingCartConvert.cartToDO(shoppingCartDTO);
@@ -65,7 +65,7 @@ public class ConCartServiceImpl implements ConCartService {
      * @return
      */
     @Override
-    @OperationLog(module = "购物车", action = "购物车更新商品信息", persist = true)
+    @OperationLog(module = "购物车", action = "购物车更新商品信息")
     public Boolean updateProduct(ShoppingCartDTO shoppingCartDTO) {
 
         ShoppingCartDO shoppingCartDO = shoppingCartConvert.cartToDO(shoppingCartDTO);
@@ -80,7 +80,7 @@ public class ConCartServiceImpl implements ConCartService {
      * @return
      */
     @Override
-    @OperationLog(module = "购物车", action = "购物车删除商品", persist = true)
+    @OperationLog(module = "购物车", action = "购物车删除商品")
     public Boolean deleteProduct(Long userId, Long productId) {
 
         Integer intDelete = conCartMapper.deleteCartDO(userId,productId);
@@ -129,7 +129,7 @@ public class ConCartServiceImpl implements ConCartService {
         Page<ShoppingCartVO> pageParam = new Page<>(pageNum,pageSize);
         IPage<ShoppingCartVO> result = conCartMapper.pageCartVO(pageParam,userId);
 
-        ResultPage<ShoppingCartVO> resultPage = ResultPage.create(result);
+        ResultPage<ShoppingCartVO> resultPage = com.relax.owl.common.mybatis.MybatisPageConverter.toResultPage(result);
 
 //        写入Redis
 

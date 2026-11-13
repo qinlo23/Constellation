@@ -3,7 +3,7 @@ package com.relax.owl.user.domain.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import com.relax.owl.api.domain.dto.PageDTO;
+import com.relax.owl.common.domain.dto.PageDTO;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

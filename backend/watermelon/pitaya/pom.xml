@@ -30,7 +30,7 @@
 <!--        模块依赖-->
         <dependency>
             <groupId>com.relax</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>common-core</artifactId>
         </dependency>
 
     </dependencies>

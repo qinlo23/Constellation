@@ -11,10 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.relax.owl.common.exception.BizException;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 import com.relax.owl.common.result.ResultStatus;
 import com.relax.owl.common.exception.LoginFailureException;
 import com.relax.owl.common.security.TokenRevocationService;
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     // [TO_BE_DELETED] 旧资料更新接口，请使用 updateUserInfo(UserInfoUpdateDTO)。
     // @Override
     // @Deprecated
-    // @OperationLog(type = LogType.USER, module = "用户", action = "更新用户信息", persist = true)
+    // @OperationLog(type = LogType.USER, module = "用户", action = "更新用户信息")
     // public Boolean updateUserInfo(UserInfoDTO userInfoDTO) {
     //     String userCode = CurrentUserContext.getUserCode();
     //     LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     // [TO_BE_DELETED] 旧改密接口，请使用 updateUserPassword(PasswordUpdateDTO)。
     // @Override
     // @Deprecated
-    // @OperationLog(type = LogType.USER, module = "用户", action = "更新用户密码", persist = true)
+    // @OperationLog(type = LogType.USER, module = "用户", action = "更新用户密码")
     // public Boolean updateUserPassword(String newPassword) {
     //     String userCode = CurrentUserContext.getUserCode();
     //     String encryptedPassword = passwordEncoder.encode(newPassword);
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
      * [UPGRADE] 更新用户资料，仅允许 userName/nickname/phone/remark。
      */
     @Override
-    @OperationLog(type = LogType.USER, module = "用户", action = "更新用户资料", persist = true)
+    @OperationLog(type = LogType.USER, module = "用户", action = "更新用户资料")
     public Boolean updateUserInfo(UserInfoUpdateDTO userInfoUpdateDTO) {
         String userCode = CurrentUserContext.getUserCode();
 
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
      * [UPGRADE] 换绑邮箱，需要新邮箱验证码，成功后旧 token 失效。
      */
     @Override
-    @OperationLog(type = LogType.USER, module = "用户", action = "换绑邮箱", persist = true)
+    @OperationLog(type = LogType.USER, module = "用户", action = "换绑邮箱")
     public Boolean updateUserEmail(EmailBindDTO emailBindDTO) {
         Long userId = CurrentUserContext.getUserId();
         UserDO userDO = userMapper.selectById(userId);
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
      * [UPGRADE] 登录后修改密码；已有密码必须校验旧密码，成功后旧 token 失效。
      */
     @Override
-    @OperationLog(type = LogType.USER, module = "用户", action = "修改密码", persist = true)
+    @OperationLog(type = LogType.USER, module = "用户", action = "修改密码")
     public Boolean updateUserPassword(PasswordUpdateDTO passwordUpdateDTO) {
         Long userId = CurrentUserContext.getUserId();
         UserDO userDO = userMapper.selectById(userId);
@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
 
     @SneakyThrows
     @Override
-    @OperationLog(type = LogType.USER, module = "用户", action = "更新用户头像", persist = true)
+    @OperationLog(type = LogType.USER, module = "用户", action = "更新用户头像")
     public String updateUserAvatar(MultipartFile file, String userCode) {
 
         validateAvatar(file);

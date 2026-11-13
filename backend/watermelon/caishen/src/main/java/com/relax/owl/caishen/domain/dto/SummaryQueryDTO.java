@@ -3,7 +3,7 @@ package com.relax.owl.caishen.domain.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import com.relax.owl.api.domain.dto.PageDTO;
+import com.relax.owl.common.domain.dto.PageDTO;
 
 /**
  * 我的总结分页查询入参。

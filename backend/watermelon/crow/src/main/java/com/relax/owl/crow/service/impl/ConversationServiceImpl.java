@@ -13,7 +13,7 @@ import com.relax.owl.crow.mapstruct.ConversationConvert;
 import com.relax.owl.crow.service.ConversationService;
 import com.relax.owl.crow.domain.vo.ConversationVO;
 import com.relax.owl.crow.domain.vo.MessageVO;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 import com.relax.owl.common.security.CurrentUserContext;
 
 import java.time.LocalDateTime;
@@ -81,7 +81,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    @OperationLog(module = "ai-conversation", action = "删除本ai会话", persist = true)
+    @OperationLog(module = "ai-conversation", action = "删除本ai会话")
     public void deleteConversation(String conversationId) {
         String userCode = CurrentUserContext.getUserCode();
         ConversationDO conversation = conversationMapper.selectOne(

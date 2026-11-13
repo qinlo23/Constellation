@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.relax.owl.common.result.ResultPage;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 import com.relax.owl.user.domain.dto.GalleryDTO;
 import com.relax.owl.user.domain.entity.GalleryDO;
 import com.relax.owl.user.domain.vo.GalleryVO;
@@ -80,7 +80,7 @@ public class GalleryServiceImpl extends ServiceImpl<GalleryMapper, GalleryDO> im
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "新增画廊项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "新增画廊项")
     public int create(GalleryDTO dto, Long userId) {
         GalleryDO galleryDO = galleryConvert.DTOConvertDO(dto);
         galleryDO.setUserId(userId);
@@ -96,7 +96,7 @@ public class GalleryServiceImpl extends ServiceImpl<GalleryMapper, GalleryDO> im
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "修改画廊项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "修改画廊项")
     public Boolean update(GalleryDTO dto, Long userId) {
         GalleryDO existing = galleryMapper.selectById(dto.getId());
         if (existing == null || !existing.getUserId().equals(userId)) {
@@ -117,7 +117,7 @@ public class GalleryServiceImpl extends ServiceImpl<GalleryMapper, GalleryDO> im
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "删除画廊项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "画廊管理", action = "删除画廊项")
     public Boolean deleteById(Long id, Long userId) {
         GalleryDO existing = galleryMapper.selectById(id);
         if (existing == null || !existing.getUserId().equals(userId)) {

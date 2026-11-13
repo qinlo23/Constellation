@@ -19,7 +19,7 @@ import com.relax.owl.caishen.service.WatchService;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultStatus;
 import com.relax.owl.common.security.CurrentUserContext;
-import com.relax.owl.log.annotation.OperationLog;
+import com.relax.owl.common.log.annotation.OperationLog;
 
 import java.time.LocalDateTime;
 import java.util.List;

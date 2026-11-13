@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import com.relax.owl.api.domain.dto.PageDTO;
+import com.relax.owl.common.domain.dto.PageDTO;
 
 /**
  * 物品简介DTO

@@ -19,10 +19,9 @@
 
     <modules>
         <module>common</module>
-        <module>api</module>
         <module>start</module>
-        <module>log</module>
-        <module>infra</module>
+
+
         <module>watermelon</module>
         <module>watermelon/administration</module>
         <module>watermelon/user</module>
@@ -60,28 +59,66 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-exception</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-mybatis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-mail</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-rabbitmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-minio</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.relax</groupId>
+                <artifactId>common-log</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!--            依赖模块-->
             <!--            自建模块-->
-            <dependency>
-                <groupId>com.relax</groupId>
-                <artifactId>common</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.relax</groupId>
-                <artifactId>api</artifactId>
-                <version>${revision}</version>
-            </dependency>
+
+
             <dependency>
                 <groupId>com.relax</groupId>
                 <artifactId>user</artifactId>
                 <version>${revision}</version>
             </dependency>
-            <dependency>
-                <groupId>com.relax</groupId>
-                <artifactId>log</artifactId>
-                <version>${revision}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.relax</groupId>
                 <artifactId>watermelon</artifactId>
@@ -112,11 +149,7 @@
                 <artifactId>caishen</artifactId>
                 <version>${revision}</version>
             </dependency>
-            <dependency>
-                <groupId>com.relax</groupId>
-                <artifactId>infra</artifactId>
-                <version>${revision}</version>
-            </dependency>
+
 
 
             <!--            子模块如果要使用依赖，要声明依赖，但是不用声明版本，版本管理中心-->

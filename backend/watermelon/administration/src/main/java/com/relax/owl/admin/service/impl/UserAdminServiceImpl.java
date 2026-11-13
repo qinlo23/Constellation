@@ -17,15 +17,15 @@ import com.relax.owl.admin.domain.entity.UserDO;
 import com.relax.owl.admin.domain.vo.AdminUserVO;
 import com.relax.owl.admin.mapper.UserAdminMapper;
 import com.relax.owl.admin.service.UserAdminService;
-import com.relax.owl.api.domain.entity.RoleDO;
-import com.relax.owl.api.mapper.RoleMapper;
+import com.relax.owl.user.domain.entity.RoleDO;
+import com.relax.owl.user.mapper.RoleMapper;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultPage;
 import com.relax.owl.common.result.ResultStatus;
 import com.relax.owl.common.security.TokenRevocationService;
 import com.relax.owl.common.utils.regex.RegexUtil;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -98,7 +98,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "新增用户", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "新增用户")
     public Long create(UserCreateDTO createDTO) {
         String username = createDTO.getUsername().trim();
         String email = createDTO.getEmail().trim();
@@ -139,7 +139,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "更新用户", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "更新用户")
     public Boolean update(Long id, UserUpdateDTO updateDTO) {
         requireUser(id);
 
@@ -195,14 +195,14 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "删除用户", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "删除用户")
     public Boolean deleteById(Long id) {
         requireUser(id);
         return userAdminMapper.deleteById(id) > 0;
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "封禁/解封用户", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "封禁/解封用户")
     public Boolean updateStatus(Long id, Byte status) {
         requireUser(id);
         validateStatus(status);
@@ -213,7 +213,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "修改用户角色", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "修改用户角色")
     public Boolean updateRole(Long id, String roleName) {
         requireUser(id);
         RoleDO roleDO = requireEnabledRole(roleName);
@@ -224,7 +224,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "重置用户密码", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "重置用户密码")
     public Boolean resetPassword(Long id, UserPasswordResetDTO resetDTO) {
         requireUser(id);
         validatePassword(resetDTO.getNewPassword());

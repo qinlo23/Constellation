@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
-import com.relax.owl.api.domain.dto.PageDTO;
+import com.relax.owl.common.domain.dto.PageDTO;
 
 import java.time.LocalDate;
 

@@ -24,10 +24,10 @@ import com.relax.owl.admin.service.MenuItemService;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultPage;
 import com.relax.owl.common.result.ResultStatus;
-import com.relax.owl.infra.minio.constant.MinioConstant;
-import com.relax.owl.infra.minio.service.FileStorageService;
-import com.relax.owl.log.annotation.OperationLog;
-import com.relax.owl.log.constant.LogType;
+import com.relax.owl.common.minio.constant.MinioConstant;
+import com.relax.owl.common.minio.service.FileStorageService;
+import com.relax.owl.common.log.annotation.OperationLog;
+import com.relax.owl.common.log.constant.LogType;
 
 /**
  * 菜单项业务实现。
@@ -106,7 +106,7 @@ public class MenuItemServiceImpl extends ServiceImpl<MenuItemMapper, MenuItemDO>
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增菜单项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "新增菜单项")
     public int create(MenuItemDTO dto) {
         validateImage(dto.getImage());
 
@@ -120,7 +120,7 @@ public class MenuItemServiceImpl extends ServiceImpl<MenuItemMapper, MenuItemDO>
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改菜单项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "修改菜单项")
     public Boolean update(MenuItemDTO dto) {
         MenuItemDO existing = menuItemMapper.selectById(dto.getId());
         if (existing == null) {
@@ -149,7 +149,7 @@ public class MenuItemServiceImpl extends ServiceImpl<MenuItemMapper, MenuItemDO>
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除菜单项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "删除菜单项")
     public Boolean deleteById(Long id) {
         MenuItemDO existing = menuItemMapper.selectById(id);
         if (existing == null) {
@@ -167,7 +167,7 @@ public class MenuItemServiceImpl extends ServiceImpl<MenuItemMapper, MenuItemDO>
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "启停菜单项", persist = true)
+    @OperationLog(type = LogType.ADMIN, module = "首页配置", action = "启停菜单项")
     public Boolean updateStatus(Long id, Integer status) {
         MenuItemDO existing = menuItemMapper.selectById(id);
         if (existing == null) {
