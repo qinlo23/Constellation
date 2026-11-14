@@ -28,7 +28,7 @@ Java 侧需要提前定义外部服务边界，确保 Python/C++ 服务接入时
 
 ## 模块落点
 
-- 模块目录：`watermelon/caishen`
+- 模块目录：`business/caishen`
 - Maven artifactId：`caishen`
 - 基础包：`xyz.nanian.owl.caishen`
 - 接口前缀：`/caishen`
@@ -36,7 +36,7 @@ Java 侧需要提前定义外部服务边界，确保 Python/C++ 服务接入时
 
 注册动作：
 
-1. 根 `pom.xml` 增加 `<module>watermelon/caishen</module>` 与 dependencyManagement。
+1. 根 `pom.xml` 增加 `<module>business/caishen</module>` 与 dependencyManagement。
 2. `start/pom.xml` 增加 caishen 依赖。
 3. `common/.../SpringdocConfig.java` 增加 `GroupedOpenApi`。
 4. 默认所有接口需要登录；公开行情或健康检查如需免登录，再在 `SecurityConfig` 中配置白名单。
@@ -85,7 +85,7 @@ Java 侧需要提前定义外部服务边界，确保 Python/C++ 服务接入时
 ## 模块代码结构
 
 ```text
-watermelon/caishen/
+business/caishen/
   src/main/java/xyz/nanian/owl/caishen/
     config/           # 模块私有配置，如异步线程池
     constant/         # 状态、周期、常量
@@ -145,9 +145,9 @@ watermelon/caishen/
 
 ### 阶段 1：模块骨架
 
-- 创建 `watermelon/caishen`、pom.xml 和基础包。
+- 创建 `business/caishen`、pom.xml 和基础包。
 - 注册根 pom、start pom、Springdoc 分组。
-- 验证 `mvn compile -pl watermelon/caishen -am`。
+- 验证 `mvn compile -pl business/caishen -am`。
 
 ### 阶段 2：数据库与实体
 
@@ -184,7 +184,7 @@ watermelon/caishen/
 
 - 编写 ADR，记录 Java 宿主和 Python/C++ 外部服务边界。
 - 更新 README 或文档中心索引。
-- 执行 `mvn test -pl watermelon/caishen -am`。
+- 执行 `mvn test -pl business/caishen -am`。
 - 启动 start 模块，验证 `/doc.html` 和基础接口。
 
 ## 待定问题

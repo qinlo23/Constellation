@@ -2,7 +2,7 @@
 
 ![一念神魔](.docs/assets/一念神魔.png)
 
-OWL 是一个多业务 Java 后端项目，基于 Spring Boot 4.1 与 Java 25 构建，覆盖用户认证、AI 对话、价格追踪与后台管理。通用能力沉淀在 `common/` 下的独立公共模块，由 `start` 组装并启动，业务模块独立演进。
+OWL 是一个多业务 Java 后端项目，基于 Spring Boot 4.1 与 Java 25 构建，覆盖用户认证、AI 对话、价格追踪与后台管理。通用能力沉淀在 `common/` 下的独立公共模块，由 `start` 组装并启动，业务模块位于 `business/` 下，包括 `user`、`admin`、`ai`、`price` 和 `caishen`。
 
 ## 技术栈
 

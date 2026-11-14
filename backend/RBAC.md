@@ -1,6 +1,6 @@
 # 用户、角色与后台权限
 
-角色和权限归 `user` 模块维护，`administration` 只暴露管理接口。`common-security` 通过 `AuthorizationProvider` 加载当前权限，不依赖业务模块。首批覆盖后台用户、角色及首页展示管理；内容管理和控制台保留原占位能力。
+角色和权限归 `user` 模块维护，`admin` 只暴露管理接口。`common-security` 通过 `AuthorizationProvider` 加载当前权限，不依赖业务模块。首批覆盖后台用户、角色及首页展示管理；内容管理和控制台保留原占位能力。
 
 ## 授权规则
 
@@ -45,7 +45,7 @@ MySQL DDL 会自动提交。本脚本仅执行一次，不能通过外层事务�
 
 ```sh
 cd backend
-mvn -pl watermelon/administration,common/common-exception -am test
+mvn -pl business/admin,common/common-exception -am test
 ```
 
 ```sh

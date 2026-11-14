@@ -22,7 +22,7 @@ OWL 需要新增个人博客模块。前端模块 `src/modules/blog` 已按真�
 - 遵循现有水果命名约定（crow、pitaya、sugarcane）。
 - 用户指定代号为 mango，弃用旧代号 kiwi。
 
-**备选**：沿用 `watermelon/blog` + kiwi 代号，已废弃。
+**备选**：沿用 `business/blog` + kiwi 代号，已废弃。
 
 ### 2. 接口前缀与表命名
 

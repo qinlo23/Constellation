@@ -34,7 +34,7 @@
 | 语言       | Python 3.11+                | 数据生态成熟，AI/ML 库丰富                    |
 | Web 框架   | FastAPI                     | 异步原生、自动生成 OpenAPI 文档、类型安全     |
 | 行情数据源 | akshare / 天天基金开放接口  | akshare 封装了国内基金/股票行情 API，免费可用 |
-| AI 框架    | LangChain + OpenAI 兼容协议 | 与 OWL crow 模块一致，复用 DeepSeek 配置      |
+| AI 框架    | LangChain + OpenAI 兼容协议 | 与 OWL ai 模块一致，复用 DeepSeek 配置      |
 | 数据验证   | Pydantic V2                 | FastAPI 内置，与 Java 侧 DTO 对齐             |
 | 包管理     | uv / poetry                 | uv 速度快，poetry 生态成熟，团队自选          |
 | 容器化     | Docker                      | 统一部署，与 OWL Java 服务编排                |
@@ -268,7 +268,7 @@ class AnalysisService:
 
 **LLM 配置**：
 
-- 模型：DeepSeek（与 OWL crow 模块一致，OpenAI 兼容协议）
+- 模型：DeepSeek（与 OWL ai 模块一致，OpenAI 兼容协议）
 - API Key：从环境变量 `DEEPSEEK_API_KEY` 读取
 - Base URL：从环境变量 `LLM_BASE_URL` 读取，默认 `https://api.deepseek.com`
 - System Prompt 模板：

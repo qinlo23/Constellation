@@ -52,13 +52,13 @@ public class SpringdocConfig {
     }
 
     /**
-     * 用户中心 API 分组：认证、验证码、个人资料、收货地址。
+     * 用户中心 API 分组：认证、验证码、个人资料、收货地址、博客与画廊。
      */
     @Bean
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
                 .group("用户中心-user")
-                .packagesToScan("xyz.nanian.owl.user.controller")
+                .packagesToScan("com.relax.owl.user.controller")
                 .build();
     }
 
@@ -69,7 +69,7 @@ public class SpringdocConfig {
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("后台管理中心-admin")
-                .packagesToScan("xyz.nanian.owl.admin.controller")
+                .packagesToScan("com.relax.owl.admin.controller")
                 .build();
     }
 
@@ -77,31 +77,21 @@ public class SpringdocConfig {
      * 价格中心 API 分组：价格追踪、比价、来源与地区对比。
      */
     @Bean
-    public GroupedOpenApi sugarcaneApi() {
+    public GroupedOpenApi priceApi() {
         return GroupedOpenApi.builder()
-                .group("价格中心-sugarcane")
-                .packagesToScan("xyz.nanian.owl.sugarcane.controller")
-                .build();
-    }
-    /**
-     * AI 中心 API 分组：对话、会话管理。
-     */
-    @Bean
-    public GroupedOpenApi crowApi() {
-        return GroupedOpenApi.builder()
-                .group("AI中心-crow")
-                .packagesToScan("xyz.nanian.owl.crow.controller")
+                .group("价格中心-price")
+                .packagesToScan("com.relax.owl.price.controller")
                 .build();
     }
 
     /**
-     * 博客中心 API 分组：文章、分类、标签、个人信息、教育、技能。
+     * AI 中心 API 分组：对话、会话管理。
      */
     @Bean
-    public GroupedOpenApi mangoApi() {
+    public GroupedOpenApi aiApi() {
         return GroupedOpenApi.builder()
-                .group("博客中心-mango")
-                .packagesToScan("xyz.nanian.owl.mango.controller")
+                .group("AI中心-ai")
+                .packagesToScan("com.relax.owl.ai.controller")
                 .build();
     }
 
@@ -112,7 +102,7 @@ public class SpringdocConfig {
     public GroupedOpenApi caishenApi() {
         return GroupedOpenApi.builder()
                 .group("理财中心-caishen")
-                .packagesToScan("xyz.nanian.owl.caishen.controller")
+                .packagesToScan("com.relax.owl.caishen.controller")
                 .build();
     }
 
