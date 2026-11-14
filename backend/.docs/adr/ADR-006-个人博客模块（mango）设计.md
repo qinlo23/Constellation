@@ -83,4 +83,4 @@ OWL 需要新增个人博客模块。前端模块 `src/modules/blog` 已按真�
 
 - [mango 博客模块开发计划](../plans/mango-blog-module-plan.md)（综合方案与实施步骤）
 - [ADR-004 个人博客模块设计（已废弃）](ADR-004-个人博客模块设计.md)
-- [mango canonical DDL](../database/OWL/mango/mango_db.sql)
+- [mango canonical DDL](../../database/modules/mango_db.sql)

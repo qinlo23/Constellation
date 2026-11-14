@@ -12,7 +12,7 @@
 - 主键：`BIGINT UNSIGNED AUTO_INCREMENT`；UUID 场景使用 `CHAR(36)`。
 - 索引：`idx_<table>_<column>`，唯一索引 `uk_<table>_<column>`，外键 `fk_<table>_<column>`。
 - `modules/` 中的现有 SQL 为固定基线，后续变更不得回写或合并到基线；已执行的版本脚本也不得改写，修正必须新增版本。
-- 详细命名规范见 [数据库表命名规范](../../spec/database-naming-convention.md)。
+- 详细命名规范见 [数据库表命名规范](../.docs/spec/naming/database-naming-convention.md)。
 
 ## 增量版本规则
 
@@ -40,10 +40,10 @@
 - `crow`：`agent_conversation`、`agent_message`。
 - `sugarcane`：`price_category`、`price_item`、`price_source`、`geo_location`、`price_record`、`price_item_media`。
 - `mango`：`blog_category`、`blog_tag`、`blog_post`、`blog_post_tag`、`blog_profile`、`blog_education`、`blog_skill_category`、`blog_skill_item`。`blog_post` 依赖 `user_account` 表，示例数据依赖 `user_init_data.sql` 中的 `admin` 用户。
-- `caishen`：`caishen_fund`、`caishen_fund_nav`、`caishen_fund_watch`、`caishen_fund_alert`、`caishen_summary`。`caishen_fund_watch.user_id` 关联 `user_account` 表，`caishen_fund_alert.watch_id` 级联删除；演示种子数据见 `caishen/caishen_seed.sql`。
+- `caishen`：`caishen_fund`、`caishen_fund_nav`、`caishen_fund_watch`、`caishen_fund_alert`、`caishen_summary`。`caishen_fund_watch.user_id` 关联 `user_account` 表，`caishen_fund_alert.watch_id` 级联删除；本目录暂未提供独立的演示种子脚本。
 
-`pitaya` 模块已废弃（暂停开发与使用），已从 Maven 构建移除；其数据库脚本和模块代码保留在 `watermelon/pitaya/` 目录，不参与构建，本次不纳入规范。
+`pitaya` 模块已废弃（暂停开发与使用），已从 Maven 构建移除；其数据库脚本和模块代码保留在后端的 `watermelon/pitaya/` 目录，不参与构建，本次不纳入规范。
 
 ## RBAC 迁移
 
-用户角色已升级为多对多关系，并增加权限目录、角色权限关联和授权版本。RBAC 改造前的旧库使用 `version/20261114_user_rbac.sql`；发布、回退和测试步骤见 [后台权限说明](../backend/RBAC.md)。当前 `modules/user_db.sql` 和 `modules/user_init_data.sql` 已包含 RBAC，按此基线新建的库不应重复执行该历史升级脚本；后续 RBAC 变更另增版本脚本。
+用户角色已升级为多对多关系，并增加权限目录、角色权限关联和授权版本。RBAC 改造前的旧库使用 `version/20261114_user_rbac.sql`；发布、回退和测试步骤见 [后台权限说明](../RBAC.md)。当前 `modules/user_db.sql` 和 `modules/user_init_data.sql` 已包含 RBAC，按此基线新建的库不应重复执行该历史升级脚本；后续 RBAC 变更另增版本脚本。

@@ -24,5 +24,6 @@ java -jar start/target/start-0.0.1.jar
 
 ## 文档
 
+- [数据库脚本与维护说明](database/README.md)
 - [文档中心](.docs/README.md)
 - [前端联调接口文档](.docs/others/前端联调接口文档.md)

@@ -649,4 +649,4 @@ is_default
 - [代码文件与包名命名规范](code-file-naming-convention.md)
 - [代码标识符命名规范](code-identifier-naming-convention.md)
 - [元数据注解命名规范](metadata-annotation-naming-convention.md)
-- [OWL 数据库目录](../../database/OWL/README.md)
+- [OWL 数据库目录](../../../database/README.md)

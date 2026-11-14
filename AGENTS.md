@@ -12,7 +12,7 @@
 - `backend/`：Java 25、Spring Boot 4.1、Maven 多模块后端。`start/` 组装应用，`common/` 提供公共基础设施，`watermelon/` 包含 `user`、`administration`、`crow`、`sugarcane`、`caishen` 等业务模块；废弃代码放在 `.rubbish/`。
 - 后端各模块使用 `src/main/java`、`src/main/resources` 和 `src/test/java` 存放源码、资源和测试；补充文档位于 `backend/.docs/`。
 - `frontend/`：Vue 3、TypeScript、Vite。`src/core/` 管理路由、API 和权限，`src/modules/` 按业务组织功能，`src/shared/` 存放公共组件、样式和资源，`tests/` 存放浏览器检查。
-- `database/` 存放数据库脚本，`docker/` 存放各服务的 Compose 配置。
+- `backend/database/` 存放数据库脚本，`docker/` 存放各服务的 Compose 配置。
 
 ## 构建、测试与本地开发
 
@@ -41,7 +41,7 @@ Java 使用四空格缩进，Vue、TypeScript 使用两空格缩进；引号和�
 
 ## 数据库约定
 
-遵循 `database/AGENTS.md`：`database/modules/` 是固定基线，后续变更统一新增到 `database/version/YYYYMMDD_NN_description.sql`。探索性开发允许调整方案，但仍保留该目录约定；默认不重建历史数据库快照或迁移回归测试设施。
+遵循 `backend/database/AGENTS.md`：`backend/database/modules/` 是固定基线，后续变更统一新增到 `backend/database/version/YYYYMMDD_NN_description.sql`。探索性开发允许调整方案，但仍保留该目录约定；默认不重建历史数据库快照或迁移回归测试设施。
 
 ## 提交与合并请求
 

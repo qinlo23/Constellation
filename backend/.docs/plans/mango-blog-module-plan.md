@@ -120,7 +120,7 @@ user_account ||--o{ blog_post : "作者"
 | `blog_skill_category` | 技能分类                                            | P2     |
 | `blog_skill_item`     | 技能条目                                            | P2     |
 
-canonical DDL 见 [`database/OWL/mango/mango_db.sql`](../database/OWL/mango/mango_db.sql)，示例数据见 [`database/OWL/mango/example_data.sql`](../database/OWL/mango/example_data.sql)。
+固定基线 DDL 见 [mango_db.sql](../../database/modules/mango_db.sql)；本目录暂未提供独立的示例数据脚本，后续数据库变更统一新增到 `backend/database/version/`。
 
 ### 命名约定
 
@@ -476,7 +476,7 @@ watermelon/mango/src/main/java/xyz/nanian/owl/mango/
 
 - [ADR-006 个人博客模块（mango）设计](ADR-006-个人博客模块（mango）设计.md)
 - [ADR-004 个人博客模块设计（已废弃）](ADR-004-个人博客模块设计.md)
-- [mango canonical DDL](../database/OWL/mango/mango_db.sql)
-- [mango 示例数据](../database/OWL/mango/example_data.sql)
+- [mango canonical DDL](../../database/modules/mango_db.sql)
+- [数据库维护说明](../../database/README.md)
 - [新模块添加手册](../guides/新模块开发指南.md)
 - [文档中心](../README.md)

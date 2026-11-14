@@ -243,7 +243,7 @@ user_account ||--o{ caishen_summary : "总结"
 
 ### DDL 位置
 
-DDL 放在 `.docs/database/OWL/caishen/caishen_db.sql`。
+固定基线 DDL 见 [caishen_db.sql](../../database/modules/caishen_db.sql)；后续变更统一新增到 `backend/database/version/`。
 
 ## 模块代码结构
 

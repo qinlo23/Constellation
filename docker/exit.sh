@@ -5,7 +5,7 @@ docker compose down
 cd ..
 
 
-cd ./redis-alone
+cd ./redis-owl
 docker compose down
 cd ..
 

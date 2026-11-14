@@ -80,7 +80,7 @@ Java 侧需要提前定义外部服务边界，确保 Python/C++ 服务接入时
 
 ### DDL
 
-DDL 放在 `.docs/database/OWL/caishen/caishen_db.sql`，与现有 `sugarcane`、`pitaya` 数据库目录保持一致。
+固定基线 DDL 见 [caishen_db.sql](../../database/modules/caishen_db.sql)；后续变更统一新增到 `backend/database/version/`。
 
 ## 模块代码结构
 
