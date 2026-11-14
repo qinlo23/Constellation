@@ -31,7 +31,7 @@ OWL 需要新增个人博客模块，代号 mango（替代此前 [ADR-004](ADR-0
 
 | 项目             | 值                                            |
 | ---------------- | --------------------------------------------- |
-| 模块目录         | `watermelon/mango`                            |
+| 模块目录         | `../../.rubbish/mango`                            |
 | Maven artifactId | `mango`                                       |
 | 基础包           | `xyz.nanian.owl.mango`                        |
 | 中文代号         | mango                                         |
@@ -425,7 +425,7 @@ watermelon/mango/src/main/java/xyz/nanian/owl/mango/
 
 | 步骤 | 任务                                                                                                   | 产出                          |
 | ---- | ------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| 1.1  | 创建 `watermelon/mango`、pom.xml、基础包；注册根 pom、start pom、SecurityConfig 白名单、Springdoc 分组 | 模块骨架                      |
+| 1.1  | 创建 `../../.rubbish/mango`、pom.xml、基础包；注册根 pom、start pom、SecurityConfig 白名单、Springdoc 分组 | 模块骨架                      |
 | 1.2  | 建表 `blog_category`、`blog_tag`、`blog_post`、`blog_post_tag`                                         | DDL                           |
 | 1.3  | 文章 CRUD 接口（6 个）                                                                                 | Controller + Service + Mapper |
 | 1.4  | 分类 CRUD 接口（4 个）                                                                                 | Controller + Service + Mapper |

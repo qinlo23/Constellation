@@ -13,6 +13,17 @@
     <artifactId>watermelon</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>administration</module>
+        <module>user</module>
+        <module>sugarcane</module>
+        <module>crow</module>
+        <module>caishen</module>
+        <!-- [MOVED_TO_USER_MODULE] 博客功能已迁移至 user 模块，mango 模块已从构建中移除 -->
+        <!-- <module>mango</module> -->
+        <!-- <module>pitaya</module> -->
+    </modules>
+
     <dependencies>
     </dependencies>
 

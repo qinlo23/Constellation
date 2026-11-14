@@ -15,7 +15,7 @@ OWL 需要新增个人博客模块。前端模块 `src/modules/blog` 已按真�
 
 ### 1. 代号与模块落点
 
-**选择**：模块代号改为 mango，替代 ADR-004 的 kiwi。模块目录 `watermelon/mango`，Maven artifactId `mango`，基础包 `xyz.nanian.owl.mango`。
+**选择**：模块代号改为 mango，替代 ADR-004 的 kiwi。模块目录 `../../.rubbish/mango`，Maven artifactId `mango`，基础包 `xyz.nanian.owl.mango`。
 
 **原因**：
 
