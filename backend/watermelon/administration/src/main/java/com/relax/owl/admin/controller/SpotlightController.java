@@ -35,6 +35,7 @@ public class SpotlightController {
      * 这个是为前端展示使用的，只要4个 */
     @GetMapping
     @Operation(summary = "获取前台焦点特性",description = "这里只获取4个")
+    @org.springframework.security.access.prepost.PreAuthorize("permitAll()")
     public Result<List<SpotlightVO>> list() {
         List<SpotlightVO> list = spotlightService.listByOrder();
         return Result.success(list);
@@ -45,6 +46,7 @@ public class SpotlightController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页获取全部焦点")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('spotlight:read')")
     public Result<ResultPage<SpotlightVO>> page(
             @RequestParam(defaultValue = "1") long pageNum,
             @RequestParam(defaultValue = "10") long pageSize) {
@@ -54,6 +56,7 @@ public class SpotlightController {
     /** 根据 id 获取单条 */
     @Operation(summary = "获取单条焦点特性")
     @GetMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('spotlight:read')")
     public Result<SpotlightVO> getById(@PathVariable Long id) {
         SpotlightVO spotlightVO = spotlightService.getById(id);
         return Result.success(spotlightVO);
@@ -62,6 +65,7 @@ public class SpotlightController {
     /** 新增焦点项目 */
     @PostMapping(consumes = "multipart/form-data")
     @Operation(summary = "新增焦点")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('spotlight:create')")
     public Result<Integer> create(@Valid @ModelAttribute SpotlightDTO dto) {
         int result= spotlightService.create(dto);
         return Result.success(result);
@@ -70,6 +74,7 @@ public class SpotlightController {
     /** 修改焦点项目 */
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     @Operation(summary = "更新焦点")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('spotlight:update')")
     public Result<ResultStatus> update(
             @PathVariable Long id,
             @Valid @ModelAttribute SpotlightDTO dto) {
@@ -85,6 +90,7 @@ public class SpotlightController {
     /** 删除焦点项目 */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除焦点")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('spotlight:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         Boolean result = spotlightService.deleteById(id);
         if(result){

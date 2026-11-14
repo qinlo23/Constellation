@@ -61,6 +61,7 @@ public class LoginServiceImpl implements LoginService {
     final PasswordEncoder passwordEncoder;
     final CodeCacheUtil codeCacheUtil;
     private final RoleMapper roleMapper;
+    private final com.relax.owl.user.mapper.AuthorizationMapper authorizationMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenRevocationService tokenRevocationService;
 
@@ -160,7 +161,7 @@ public class LoginServiceImpl implements LoginService {
     // }
 
     /**
-     * [UPGRADE] 密码登录，role 从数据库读取，补齐账号状态与角色启用校验。
+     * 密码登录只认证账号身份；权限由当前启用角色决定。
      */
     @Override
     public String login(PasswordLoginDTO passwordLoginDTO) {
@@ -177,15 +178,14 @@ public class LoginServiceImpl implements LoginService {
         if (!passwordEncoder.matches(passwordLoginDTO.getPassword(), userDO.getPassword())) {
             throw new LoginFailureException(ResultStatus.PARAMS_INVALID);
         }
-        RoleDO roleDO = loadEnabledRole(userDO);
-
-        return getToken(userDO, roleDO);
+        return getToken(userDO);
     }
 
     /**
      * [UPGRADE] 邮箱验证码登录，未注册邮箱自动创建默认 USER 账号。
      */
     @Override
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public String login(EmailLoginDTO emailLoginDTO) {
         verifyEmailCode(emailLoginDTO.getEmail(), emailLoginDTO.getCode());
 
@@ -196,9 +196,7 @@ public class LoginServiceImpl implements LoginService {
         if (!Objects.equals(userDO.getStatus(), UserConstant.DEFAULT_STATUS)) {
             throw new LoginFailureException(ResultStatus.ACCOUNT_DISABLED);
         }
-        RoleDO roleDO = loadEnabledRole(userDO);
-
-        return getToken(userDO, roleDO);
+        return getToken(userDO);
     }
 
     /**
@@ -243,33 +241,22 @@ public class LoginServiceImpl implements LoginService {
     }
 
 
-    // [TO_BE_DELETED] 旧 token 生成逻辑，仅保留给旧代码审查。
-    // @Deprecated
-    // private String getToken(String email) {
-    //     LambdaQueryWrapper<UserDO> wrapper = Wrappers.lambdaQuery();
-    //     wrapper.eq(UserDO::getEmail, email);
-    //     UserDO userDO = userMapper.selectOne(wrapper);
-    //     String userCode = userDO.getUserCode();
-    //     Long userId = userDO.getId();
-    //     RoleDO roleDO = roleMapper.selectOne(Wrappers.<RoleDO>lambdaQuery().eq(RoleDO::getRoleName, userDO.getRoleName()));
-    //     return jwtTokenProvider.generateToken(userId, userCode, email, roleDO.getRoleName());
-    // }
-
     /**
      * 使用 jti 和当前 tokenVersion 生成 JWT。
      *
      * @param userDO 用户实体
-     * @param roleDO 已启用的角色
      * @return JWT token
      */
-    private String getToken(UserDO userDO, RoleDO roleDO) {
+    private String getToken(UserDO userDO) {
         long tokenVersion = tokenRevocationService.getTokenVersion(userDO.getId());
         return jwtTokenProvider.generateToken(
                 userDO.getId(),
                 userDO.getUserCode(),
                 userDO.getEmail(),
-                roleDO.getRoleName(),
-                tokenVersion);
+                authorizationMapper.roles(userDO.getId()).stream()
+                        .filter(role -> Boolean.TRUE.equals(role.getEnabled()))
+                        .map(RoleDO::getRoleCode).findFirst().orElse(null),
+                tokenVersion, userDO.getAuthVersion() == null ? 0 : userDO.getAuthVersion());
     }
 
     /**
@@ -285,31 +272,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     /**
-     * 按用户角色名称加载已启用的角色。
-     *
-     * @param userDO 用户实体
-     * @return 启用的角色
-     */
-    private RoleDO loadEnabledRole(UserDO userDO) {
-        if (userDO.getRoleName() == null || userDO.getRoleName().isBlank()) {
-            throw new LoginFailureException(ResultStatus.ROLE_FAILED);
-        }
-        RoleDO roleDO = roleMapper.selectOne(
-                Wrappers.<RoleDO>lambdaQuery().eq(RoleDO::getRoleName, userDO.getRoleName()));
-        if (roleDO == null || !Boolean.TRUE.equals(roleDO.getEnabled())) {
-            throw new LoginFailureException(ResultStatus.ROLE_FAILED);
-        }
-        return roleDO;
-    }
-
-    /**
      * 加载注册默认角色 USER，不存在或未启用时抛出登录异常。
      *
      * @return 默认角色
      */
     private RoleDO loadDefaultRole() {
         RoleDO roleDO = roleMapper.selectOne(
-                Wrappers.<RoleDO>lambdaQuery().eq(RoleDO::getRoleName, UserConstant.DEFAULT_ROLE_NAME));
+                Wrappers.<RoleDO>lambdaQuery().eq(RoleDO::getRoleCode, "USER"));
         if (roleDO == null || !Boolean.TRUE.equals(roleDO.getEnabled())) {
             throw new LoginFailureException(ResultStatus.ROLE_FAILED);
         }
@@ -326,13 +295,15 @@ public class LoginServiceImpl implements LoginService {
         userDO.setPassword(null);
         userDO.setEmail(email);
         userDO.setAvatarUrl(UserConstant.DEFAULT_AVATAR);
-        userDO.setRoleName(loadDefaultRole().getRoleName());
+        RoleDO defaultRole = loadDefaultRole();
+        userDO.setAuthVersion(0L);
         userDO.setStatus(UserConstant.DEFAULT_STATUS);
         userDO.setNickname(UserConstant.DEFAULT_NICK_NAME);
         userDO.setRemark(UserConstant.DEFAULT_REMARK);
         userDO.setCreateTime(now);
 
         userMapper.insert(userDO);
+        authorizationMapper.assign(userDO.getId(), defaultRole.getId());
         return userDO;
     }
 
@@ -386,23 +357,5 @@ public class LoginServiceImpl implements LoginService {
     //     return true;
     // }
 
-    // [TO_BE_DELETED] 旧建号逻辑，已由 createUser 取代。
-    // private Boolean saveUserInfo(String email) {
-    //     UserDO userDO = new UserDO();
-    //     String uuid = UUID.randomUUID().toString();
-    //     LocalDateTime now = LocalDateTime.now();
-    //     userDO.setUserCode(uuid);
-    //     userDO.setUserName(UserConstant.DEFAULT_USER_NAME + uuid);
-    //     userDO.setPassword(null);
-    //     userDO.setEmail(email);
-    //     userDO.setAvatarUrl(UserConstant.DEFAULT_AVATAR);
-    //     userDO.setRoleName(UserConstant.DEFAULT_ROLE_NAME);
-    //     userDO.setStatus(UserConstant.DEFAULT_STATUS);
-    //     userDO.setNickname(UserConstant.DEFAULT_NICK_NAME);
-    //     userDO.setRemark(UserConstant.DEFAULT_REMARK);
-    //     userDO.setCreateTime(now);
-    //     userMapper.insert(userDO);
-    //     return true;
-    // }
 
 }

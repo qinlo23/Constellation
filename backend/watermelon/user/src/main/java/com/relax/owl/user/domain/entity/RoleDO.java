@@ -31,6 +31,10 @@ public class RoleDO implements Serializable {
     @Schema(description = "角色名称")
     private String roleName;
 
+    private String roleCode;
+
+    private Boolean builtIn;
+
     @TableField("description")
     @Schema(description = "角色描述")
     private String description;

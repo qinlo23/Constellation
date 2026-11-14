@@ -44,8 +44,8 @@ export const adminUserApi = {
   },
 
   /** 修改用户角色 — PUT /admin/user-do/{id}/role */
-  updateRole(id: number, roleName: string): Promise<Result<null>> {
-    return request.put(`${ADMIN_USER_BASE_URL}/${id}/role`, null, { params: { roleName } })
+  updateRoles(id: number, roleIds: number[]): Promise<Result<null>> {
+    return request.put(`${ADMIN_USER_BASE_URL}/${id}/roles`, { roleIds })
   },
 
   /** 重置用户密码 — PUT /admin/user-do/{id}/password/reset */

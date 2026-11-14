@@ -25,7 +25,7 @@ public class UserConstant {
     public static final String DEFAULT_AVATAR = "/DEFAULT_AVATAR.png";
 
     /**
-     * 新用户默认角色名称，对应 role 表中的普通用户角色。
+     * 新用户默认角色名称，对应 user_role.role_code 中的普通用户角色。
      */
     public static final String DEFAULT_ROLE_NAME = "USER";
 

@@ -5,7 +5,7 @@ import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { loginMailApi, loginPasswordApi, resetPasswordApi, sendCodeApi } from '@/modules/user/api/auth'
 import { getUserInfoApi } from '@/modules/user/api/profile'
-import { setCurrentUser, setToken } from '@/core/permission'
+import { setCurrentUser, setToken, hasPermission } from '@/core/permission'
 import { ElMessage } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
 import type { LoginOrRegisterParams, SendCodeParams } from '@/modules/user/types'
@@ -63,7 +63,7 @@ const submitLoginOrRegister = async (type: 'login' | 'register') => {
 
             if (userInfoResult.code === 200) {
                 setCurrentUser(userInfoResult.data)
-                const isAdmin = userInfoResult.data.role?.toUpperCase() === 'ADMIN'
+                const isAdmin = hasPermission('admin:access')
                 await router.push(isAdmin ? { name: 'admin-home-dashboard' } : { name: 'front-home' })
             } else {
                 await router.push('/')

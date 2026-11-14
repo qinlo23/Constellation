@@ -61,9 +61,8 @@ public class UserDO implements Serializable {
     @TableField("nickname")
     private String nickname;
 
-    @Schema(description = "角色名称")
-    @TableField("role_name")
-    private String roleName;
+    @TableField("auth_version")
+    private Long authVersion;
 
     @Schema(description = "状态：0=正常，1=封禁")
     @TableField("status")

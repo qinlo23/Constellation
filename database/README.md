@@ -36,3 +36,7 @@
 - `caishen`：`caishen_fund`、`caishen_fund_nav`、`caishen_fund_watch`、`caishen_fund_alert`、`caishen_summary`。`caishen_fund_watch.user_id` 关联 `user_account` 表，`caishen_fund_alert.watch_id` 级联删除；演示种子数据见 `caishen/caishen_seed.sql`。
 
 `pitaya` 模块已废弃（暂停开发与使用），已从 Maven 构建移除；其数据库脚本和模块代码保留在 `watermelon/pitaya/` 目录，不参与构建，本次不纳入规范。
+
+## RBAC 迁移
+
+用户角色已升级为多对多关系，并增加权限目录、角色权限关联和授权版本。已有库使用 `migrations/20261114_user_rbac.sql`；发布、回退和测试步骤见 [后台权限说明](../backend/RBAC.md)。新建库执行 `modules/user_db.sql` 和 `modules/user_init_data.sql`。

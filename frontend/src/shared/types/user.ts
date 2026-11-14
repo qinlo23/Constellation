@@ -24,6 +24,8 @@ export interface UserInfoVO {
   phone: string
   remark: string
   role: string
+  roles: string[]
+  permissions: string[]
   avatarUrl: string
   createTime: string
 }

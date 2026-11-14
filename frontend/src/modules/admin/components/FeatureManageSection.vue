@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission } from '@/core/permission'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -146,7 +147,7 @@ onMounted(fetchList)
 
 <template>
   <div class="manage-panel">
-    <AdminPageHeader
+    <AdminPageHeader :show-action="hasPermission('feature:create')"
       title="特性管理"
       subtitle="首页特性卡片内容维护"
       action-label="新增特性"
@@ -167,8 +168,8 @@ onMounted(fetchList)
         <el-table-column prop="sortOrder" label="排序" width="90" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
-            <el-button link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
+            <el-button v-permission="'feature:update'" link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
+            <el-button v-permission="'feature:delete'" link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

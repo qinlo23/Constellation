@@ -2,8 +2,10 @@
 export interface RoleVO {
   /** 角色 ID */
   id: number
+  builtIn: boolean
   /** 角色名，最大 100 字符，唯一 */
   roleName: string
+  roleCode: string
   /** 角色描述 */
   description: string
   /** 是否启用 */
@@ -18,6 +20,7 @@ export interface RoleVO {
 export interface RoleCreateDTO {
   /** 角色名，最大 100 字符，唯一 */
   roleName: string
+  roleCode: string
   /** 描述，最大 255 字符 */
   description?: string
   /** 是否启用，默认 true */
@@ -30,3 +33,5 @@ export interface RoleUpdateDTO {
   description?: string
   enabled?: boolean
 }
+
+export interface PermissionInfo { code: string; name: string; module: string }

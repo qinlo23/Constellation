@@ -35,7 +35,7 @@ public class AdminUserVO {
     private String email;
 
     @Schema(description = "角色名称")
-    private String roleName;
+    private java.util.List<com.relax.owl.user.domain.vo.RoleInfo> roles;
 
     @Schema(description = "状态：0=正常，1=封禁")
     private Byte status;

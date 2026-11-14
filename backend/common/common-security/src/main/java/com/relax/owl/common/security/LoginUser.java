@@ -23,6 +23,8 @@ public class LoginUser {
     /** 用户邮箱 */
     private String email;
 
-    /** 角色名，例如 ADMIN、MERCHANT、USER */
+    /** 首个有效角色编码，仅兼容展示；授权使用 roles 和 permissions。 */
     private String roleName;
+    private java.util.List<String> roles = java.util.List.of();
+    private java.util.List<String> permissions = java.util.List.of();
 }

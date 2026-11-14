@@ -21,6 +21,10 @@ public class RoleCreateCommand {
     @Size(max = 100, message = "角色名称长度不能超过100")
     private String roleName;
 
+    @jakarta.validation.constraints.NotBlank
+    @jakarta.validation.constraints.Pattern(regexp = "[A-Z][A-Z0-9_]{1,63}")
+    private String roleCode;
+
     @Schema(description = "角色描述", example = "系统管理员角色")
     @Size(max = 255, message = "角色描述长度不能超过255")
     private String description;

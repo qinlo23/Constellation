@@ -127,8 +127,13 @@ public class MenuItemServiceImpl extends ServiceImpl<MenuItemMapper, MenuItemDO>
             throw new BizException(ResultStatus.DATA_NOT_EXIST);
         }
 
+        boolean canChangeStatus = com.relax.owl.common.security.PermissionChecks.has("menu-item:status");
+        if (dto.getStatus() != null && !java.util.Objects.equals(dto.getStatus(), existing.getStatus()) && !canChangeStatus)
+            throw new org.springframework.security.access.AccessDeniedException("Missing menu-item:status");
         MenuItemDO menuItemDO = menuItemConvert.DTOConvertDO(dto);
         menuItemDO.setId(dto.getId());
+        // Omit status for editors without status permission, including concurrent status changes.
+        if (!canChangeStatus) menuItemDO.setStatus(null);
         // 先继承原对象 key，只有确实传了新文件才覆盖
         menuItemDO.setImageUrl(existing.getImageUrl());
 

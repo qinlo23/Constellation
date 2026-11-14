@@ -12,7 +12,7 @@ export interface AdminUserQuery {
   /** 0=正常，1=封禁 */
   status?: AdminUserStatus
   /** 精确匹配角色名 */
-  roleName?: string
+  roleId?: number
 }
 
 /** 后台用户视图对象 — AdminUserVO */
@@ -30,7 +30,7 @@ export interface AdminUserVO {
   /** 邮箱 */
   email: string
   /** 角色名 */
-  roleName: string
+  roles: import('./role').RoleVO[]
   /** 0=正常，1=封禁 */
   status: AdminUserStatus
   /** 头像 URL */
@@ -56,7 +56,7 @@ export interface UserCreateDTO {
   /** 昵称，最大 50 字符 */
   nickname?: string
   /** 角色名，必须是已启用角色 */
-  roleName: string
+  roleIds?: number[]
   /** 0=正常，1=封禁，默认 0 */
   status?: AdminUserStatus
   /** 备注，最大 255 字符 */
@@ -69,7 +69,6 @@ export interface UserUpdateDTO {
   email?: string
   phone?: string
   nickname?: string
-  roleName?: string
   status?: AdminUserStatus
   remark?: string
 }

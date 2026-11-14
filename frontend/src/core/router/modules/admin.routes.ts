@@ -1,3 +1,4 @@
+import { ALL_ADMIN_MENU_ITEMS } from '@/modules/admin/constants/menu'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 
 const adminRoutes = [
@@ -5,8 +6,8 @@ const adminRoutes = [
     path: '/admin',
     component: AdminLayout,
     meta: {
-      // requiresAuth: true,
-      // requiresAdmin: true,
+      requiresAuth: true,
+      permission: 'admin:access',
     },
     children: [
       {
@@ -72,4 +73,8 @@ const adminRoutes = [
   },
 ]
 
+for (const page of adminRoutes[0]!.children[1]!.children ?? []) {
+  const menu = ALL_ADMIN_MENU_ITEMS.find(item => item.path === `/admin/dashboard/${page.path}`)
+  Object.assign(page, { meta: { permission: menu?.permission ?? 'admin:unconfigured' } })
+}
 export default adminRoutes

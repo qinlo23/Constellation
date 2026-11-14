@@ -1,4 +1,6 @@
 
+import { shallowRef } from "vue";
+import { getUserInfoApi } from "@/modules/user/api/profile";
 import type { UserInfoVO } from "@/shared/types";
 import { AUTH_STORAGE_KEY, TOKEN_STORAGE_KEY, AUTH_CHANGE_EVENT } from "@/shared/constants";
 import { logoutApi } from '@/modules/user/api/auth'
@@ -8,6 +10,8 @@ import { logoutApi } from '@/modules/user/api/auth'
  * 登录鉴权工具模块 - 与后端API交互的真实认证系统
  */
 export const setToken = (token: string): void => {
+  accessUser.value = null
+  sessionToken = null
   localStorage.setItem(TOKEN_STORAGE_KEY, token)
 }
 
@@ -46,6 +50,8 @@ export const logout = async (): Promise<void> => {
 
 // 设置当前用户信息到localStorage，并触发认证状态变化事件
 export const setCurrentUser = (userData: UserInfoVO): void => {
+  accessUser.value = userData
+  sessionToken = getToken()
   window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData))
   window.dispatchEvent(new CustomEvent(AUTH_CHANGE_EVENT, { detail: userData }))// 触发认证状态变化事件
 }
@@ -82,4 +88,40 @@ export const onAuthChange = (callback: (user: UserInfoVO | null) => void): (() =
   return () => {
     window.removeEventListener(AUTH_CHANGE_EVENT, handler)
   }
+}
+
+
+const accessUser = shallowRef<UserInfoVO | null>(null)
+let sessionToken: string | null = null
+let pending: Promise<void> | null = null
+
+export const hasRole = (role: string): boolean => accessUser.value?.roles?.includes(role) ?? false
+export const hasPermission = (permission: string): boolean =>
+  permission === 'role:manage' ? hasRole('SUPER_ADMIN') : accessUser.value?.permissions?.includes(permission) ?? false
+
+export async function ensureAuthorization(): Promise<void> {
+  const token = getToken()
+  if (!token) { accessUser.value = null; sessionToken = null; return }
+  if (sessionToken === token && accessUser.value) return
+  if (!pending) {
+    pending = getUserInfoApi().then(result => {
+      if (getToken() === token) setCurrentUser(result.data)
+    }).finally(() => { pending = null })
+  }
+  await pending
+  // Another login can replace a token while a request is pending.
+  if (getToken() && sessionToken !== getToken()) await ensureAuthorization()
+}
+
+if (isClient()) {
+  window.addEventListener(AUTH_CHANGE_EVENT, () => {
+    if (!getToken()) { accessUser.value = null; sessionToken = null }
+  })
+  window.addEventListener('storage', (event) => {
+    if (event.key === TOKEN_STORAGE_KEY || event.key === AUTH_STORAGE_KEY) {
+      accessUser.value = null
+      sessionToken = null
+      window.dispatchEvent(new CustomEvent(AUTH_CHANGE_EVENT))
+    }
+  })
 }

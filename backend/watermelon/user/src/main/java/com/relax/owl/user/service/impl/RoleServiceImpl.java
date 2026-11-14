@@ -1,155 +1,94 @@
 package com.relax.owl.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.relax.owl.user.domain.dto.RoleCreateCommand;
-import com.relax.owl.user.domain.dto.RoleUpdateCommand;
-import com.relax.owl.user.domain.entity.UserDO;
+import com.relax.owl.user.domain.dto.*;
+import com.relax.owl.user.domain.entity.RoleDO;
 import com.relax.owl.user.domain.vo.RoleInfo;
 import com.relax.owl.user.mapper.RoleMapper;
-import com.relax.owl.user.mapper.UserMapper;
-import com.relax.owl.user.service.RoleService;
-import com.relax.owl.user.domain.entity.RoleDO;
+import com.relax.owl.user.service.*;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultStatus;
-
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-/**
- * <p>
- * 角色表 服务实现类
- * </p>
- *
- * @author slnt23
- * @since 2026-04-13 23:53:18
- */
 @Service
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('SUPER_ADMIN')")
+@Transactional(rollbackFor = Exception.class)
 public class RoleServiceImpl implements RoleService {
-
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RoleServiceImpl.class);
     private final RoleMapper roleMapper;
-    private final UserMapper userMapper;
-
-    @Override
+    private final AuthorizationService authorization;
     public List<RoleInfo> listAll() {
-        List<RoleDO> roleDOS = roleMapper.selectList(
-                Wrappers.<RoleDO>lambdaQuery().orderByAsc(RoleDO::getId));
-        return roleDOS.stream().map(this::toVO).toList();
+        return roleMapper.selectList(Wrappers.<RoleDO>lambdaQuery().orderByAsc(RoleDO::getId)).stream().map(this::toVO).toList();
     }
-
-    @Override
-    public RoleInfo getById(Long id) {
-        return toVO(requireRole(id));
+    public RoleInfo getById(Long id) { return toVO(authorization.requireRole(id)); }
+    public Long create(RoleCreateCommand command) {
+        authorization.lock();
+        if (command.getRoleCode() == null || !command.getRoleCode().matches("[A-Z][A-Z0-9_]{1,63}"))
+            throw new BizException(ResultStatus.PARAMS_INVALID);
+        RoleDO role = new RoleDO();
+        role.setRoleCode(command.getRoleCode());
+        role.setRoleName(command.getRoleName().trim());
+        role.setDescription(command.getDescription());
+        role.setEnabled(!Boolean.FALSE.equals(command.getEnabled()));
+        role.setBuiltIn(false);
+        roleMapper.insert(role);
+        audit(role.getId(), null, role);
+        return role.getId();
     }
-
-    @Override
-    public Long create(RoleCreateCommand createDTO) {
-        String roleName = createDTO.getRoleName().trim();
-        if (existsByRoleName(roleName, null)) {
-            throw new BizException(ResultStatus.DATA_ALREADY_EXIST);
+    public Boolean update(Long id, RoleUpdateCommand command) {
+        authorization.lock();
+        RoleDO role = authorization.requireRole(id);
+        String before = role.toString();
+        if (command.getEnabled() != null && !command.getEnabled().equals(role.getEnabled())) {
+            checkMutable(role);
+            role.setEnabled(command.getEnabled());
+            authorization.bumpRole(id);
         }
-
-        RoleDO roleDO = new RoleDO();
-        roleDO.setRoleName(roleName);
-        roleDO.setDescription(createDTO.getDescription());
-        roleDO.setEnabled(createDTO.getEnabled() == null || createDTO.getEnabled());
-        roleDO.setCreateTime(LocalDateTime.now());
-        roleDO.setUpdateTime(LocalDateTime.now());
-        roleMapper.insert(roleDO);
-        return roleDO.getId();
+        if (command.getRoleName() != null && !command.getRoleName().isBlank()) role.setRoleName(command.getRoleName().trim());
+        if (command.getDescription() != null) role.setDescription(command.getDescription());
+        boolean updated = roleMapper.updateById(role) > 0;
+        if (updated) audit(id, before, role);
+        return updated;
     }
-
-    @Override
-    public Boolean update(Long id, RoleUpdateCommand updateDTO) {
-        requireRole(id);
-
-        LambdaUpdateWrapper<RoleDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(RoleDO::getId, id);
-        boolean changed = false;
-
-        if (updateDTO.getRoleName() != null && !updateDTO.getRoleName().isBlank()) {
-            String roleName = updateDTO.getRoleName().trim();
-            if (existsByRoleName(roleName, id)) {
-                throw new BizException(ResultStatus.DATA_ALREADY_EXIST);
-            }
-            wrapper.set(RoleDO::getRoleName, roleName);
-            changed = true;
-        }
-        if (updateDTO.getDescription() != null) {
-            wrapper.set(RoleDO::getDescription, updateDTO.getDescription().trim());
-            changed = true;
-        }
-        if (updateDTO.getEnabled() != null) {
-            checkRoleCanDisable(id, updateDTO.getEnabled());
-            wrapper.set(RoleDO::getEnabled, updateDTO.getEnabled());
-            changed = true;
-        }
-
-        return !changed || roleMapper.update(null, wrapper) > 0;
-    }
-
-    @Override
     public Boolean deleteById(Long id) {
-        RoleDO roleDO = requireRole(id);
-        if (isRoleInUse(roleDO.getRoleName())) {
-            throw new BizException(ResultStatus.ROLE_IN_USE);
-        }
-        return roleMapper.deleteById(id) > 0;
+        authorization.lock();
+        RoleDO role = authorization.requireRole(id);
+        checkMutable(role);
+        authorization.bumpRole(id);
+        boolean deleted = roleMapper.deleteById(id) > 0;
+        if (deleted) audit(id, role, null);
+        return deleted;
     }
-
-    @Override
     public Boolean updateEnabled(Long id, Boolean enabled) {
-        requireRole(id);
-        checkRoleCanDisable(id, enabled);
-
-        LambdaUpdateWrapper<RoleDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(RoleDO::getId, id).set(RoleDO::getEnabled, enabled);
-        return roleMapper.update(null, wrapper) > 0;
+        RoleUpdateCommand command = new RoleUpdateCommand();
+        command.setEnabled(enabled);
+        return update(id, command);
     }
-
-    private RoleDO requireRole(Long id) {
-        RoleDO roleDO = roleMapper.selectById(id);
-        if (roleDO == null) {
-            throw new BizException(ResultStatus.NOT_FOUND);
-        }
-        return roleDO;
-    }
-
-    private RoleInfo toVO(RoleDO roleDO) {
-        RoleInfo roleVO = new RoleInfo();
-        roleVO.setId(roleDO.getId());
-        roleVO.setRoleName(roleDO.getRoleName());
-        roleVO.setDescription(roleDO.getDescription());
-        roleVO.setEnabled(roleDO.getEnabled());
-        roleVO.setCreateTime(roleDO.getCreateTime());
-        roleVO.setUpdateTime(roleDO.getUpdateTime());
-        return roleVO;
-    }
-
-    private boolean existsByRoleName(String roleName, Long excludeId) {
-        LambdaQueryWrapper<RoleDO> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(RoleDO::getRoleName, roleName);
-        if (excludeId != null) {
-            wrapper.ne(RoleDO::getId, excludeId);
-        }
-        return roleMapper.selectCount(wrapper) > 0;
-    }
-
-    private boolean isRoleInUse(String roleName) {
-        LambdaQueryWrapper<UserDO> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(UserDO::getRoleName, roleName);
-        return userMapper.selectCount(wrapper) > 0;
-    }
-
-    private void checkRoleCanDisable(Long id, Boolean enabled) {
-        RoleDO roleDO = requireRole(id);
-        if (Boolean.FALSE.equals(enabled) && isRoleInUse(roleDO.getRoleName())) {
-            throw new BizException(ResultStatus.ROLE_IN_USE);
+    private void audit(Long id, Object before, Object after) {
+        Long operator = com.relax.owl.common.security.CurrentUserContext.getUserId();
+        String previous = String.valueOf(before);
+        String next = String.valueOf(after);
+        if (org.springframework.transaction.support.TransactionSynchronizationManager.isSynchronizationActive()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    public void afterCommit() {
+                        log.info("authorization operator={} role={} before={} after={} success=true", operator, id, previous, next);
+                    }
+                });
         }
     }
-
+    private void checkMutable(RoleDO role) {
+        if (Boolean.TRUE.equals(role.getBuiltIn())) throw new BizException(ResultStatus.ROLE_IN_USE);
+    }
+    private RoleInfo toVO(RoleDO role) {
+        RoleInfo result = new RoleInfo();
+        BeanUtils.copyProperties(role, result);
+        return result;
+    }
 }

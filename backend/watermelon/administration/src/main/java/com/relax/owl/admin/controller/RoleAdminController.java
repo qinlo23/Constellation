@@ -25,9 +25,30 @@ import java.util.List;
 @RequestMapping("/api/admin/role-do")
 @RequiredArgsConstructor
 @Tag(name = "后台角色管理")
+@org.springframework.security.access.prepost.PreAuthorize("hasRole('SUPER_ADMIN')")
 public class RoleAdminController {
 
     private final RoleAdminService roleAdminService;
+    private final com.relax.owl.user.service.AuthorizationService authorization;
+
+    @GetMapping("/permissions")
+    public Result<java.util.List<com.relax.owl.user.domain.vo.PermissionInfo>> permissions() {
+        return Result.success(authorization.catalog());
+    }
+
+    @GetMapping("/{id}/permissions")
+    public Result<java.util.List<String>> rolePermissions(@PathVariable Long id) {
+        return Result.success(authorization.rolePermissions(id));
+    }
+
+    @PutMapping("/{id}/permissions")
+    public Result<Void> replacePermissions(@PathVariable Long id, @Valid @RequestBody PermissionAssignment body) {
+        authorization.replacePermissions(id, body.permissions());
+        return Result.success();
+    }
+
+    public record PermissionAssignment(@jakarta.validation.constraints.NotNull
+            java.util.List<@jakarta.validation.constraints.NotBlank String> permissions) {}
 
     @GetMapping
     @Operation(summary = "角色列表")

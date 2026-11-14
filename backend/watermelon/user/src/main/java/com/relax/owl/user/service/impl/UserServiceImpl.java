@@ -48,6 +48,7 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final com.relax.owl.user.service.AuthorizationService authorization;
     private final PasswordEncoder passwordEncoder;
     private final UserConvert userConvert;
     private final FileStorageService fileStorageService;
@@ -249,9 +250,11 @@ public class UserServiceImpl implements UserService {
         if (!Objects.equals(userDO.getStatus(), UserConstant.DEFAULT_STATUS)) {
             throw new LoginFailureException(ResultStatus.ACCOUNT_DISABLED);
         }
-        String roleName = userDO.getRoleName();
+        var access = authorization.load(userId);
         UserInfoVO userInfoVO = userConvert.UserDOToUserVO(userDO);
-        userInfoVO.setRole(roleName);
+        userInfoVO.setRole(String.join(", ", access.roles()));
+        userInfoVO.setRoles(access.roles());
+        userInfoVO.setPermissions(access.permissions());
         // [TO_BE_DELETED] rawPhone 字段废弃，不再回填
 
         String avatarUrl = userDO.getAvatarUrl();

@@ -33,13 +33,14 @@ public class UserAdminController {
      */
     @GetMapping
     @Operation(summary = "用户分页列表")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:read')")
     public Result<ResultPage<AdminUserVO>> page(
             @RequestParam(defaultValue = "1") long pageNum,
             @RequestParam(defaultValue = "10") long pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Byte status,
-            @RequestParam(required = false) String roleName) {
-        return Result.success(userAdminService.page(pageNum, pageSize, keyword, status, roleName));
+            @RequestParam(required = false) Long roleId) {
+        return Result.success(userAdminService.page(pageNum, pageSize, keyword, status, roleId));
     }
 
     /**
@@ -47,6 +48,7 @@ public class UserAdminController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "用户详情")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:read')")
     public Result<AdminUserVO> getById(@PathVariable Long id) {
         return Result.success(userAdminService.getById(id));
     }
@@ -56,6 +58,7 @@ public class UserAdminController {
      */
     @PostMapping
     @Operation(summary = "新增用户")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:create')")
     public Result<Long> create(@Valid @RequestBody UserCreateDTO createDTO) {
         return Result.success(userAdminService.create(createDTO));
     }
@@ -65,6 +68,7 @@ public class UserAdminController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "更新用户")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:update')")
     public Result<ResultStatus> update(@PathVariable Long id,
                                        @Valid @RequestBody UserUpdateDTO updateDTO) {
         if (userAdminService.update(id, updateDTO)) {
@@ -78,6 +82,7 @@ public class UserAdminController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除用户")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:delete')")
     public Result<ResultStatus> delete(@PathVariable Long id) {
         if (userAdminService.deleteById(id)) {
             return Result.success();
@@ -90,6 +95,7 @@ public class UserAdminController {
      */
     @PutMapping("/{id}/status")
     @Operation(summary = "封禁/解封用户")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:status')")
     public Result<ResultStatus> updateStatus(@PathVariable Long id,
                                              @RequestParam Byte status) {
         if (userAdminService.updateStatus(id, status)) {
@@ -98,24 +104,23 @@ public class UserAdminController {
         return Result.fail();
     }
 
-    /**
-     * 修改用户角色，可用于设置为管理员。
-     */
-    @PutMapping("/{id}/role")
-    @Operation(summary = "修改用户角色")
-    public Result<ResultStatus> updateRole(@PathVariable Long id,
-                                           @RequestParam String roleName) {
-        if (userAdminService.updateRole(id, roleName)) {
-            return Result.success();
-        }
-        return Result.fail();
+    @PutMapping("/{id}/roles")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "替换用户角色，成功后需要重新登录")
+    public Result<Void> updateRoles(@PathVariable Long id, @Valid @RequestBody RoleAssignment body) {
+        userAdminService.updateRoles(id, body.roleIds());
+        return Result.success();
     }
+
+    public record RoleAssignment(@jakarta.validation.constraints.NotEmpty
+            java.util.List<@jakarta.validation.constraints.NotNull @jakarta.validation.constraints.Positive Long> roleIds) {}
 
     /**
      * 重置用户密码，成功后旧 token 全部失效。
      */
     @PutMapping("/{id}/password/reset")
     @Operation(summary = "重置用户密码")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('user:reset-password')")
     public Result<ResultStatus> resetPassword(@PathVariable Long id,
                                               @Valid @RequestBody UserPasswordResetDTO resetDTO) {
         if (userAdminService.resetPassword(id, resetDTO)) {

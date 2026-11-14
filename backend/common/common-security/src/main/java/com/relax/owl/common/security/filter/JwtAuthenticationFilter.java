@@ -21,14 +21,14 @@ import com.relax.owl.common.security.CurrentUserContext;
 import com.relax.owl.common.security.JwtConstants;
 import com.relax.owl.common.security.JwtTokenProvider;
 import com.relax.owl.common.security.LoginUser;
-import com.relax.owl.common.security.RoleConstants;
 import com.relax.owl.common.security.TokenRevocationService;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
+import com.relax.owl.common.security.AuthorizationProvider;
 
 /**
  * JWT 认证过滤器。
@@ -67,6 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String JWT_ERROR_STATUS_ATTRIBUTE = "JWT_ERROR_STATUS";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private AuthorizationProvider authorizationProvider;
     private final TokenRevocationService tokenRevocationService;
 
     /**
@@ -90,6 +91,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.tokenRevocationService = revocationServiceProvider == null
                 ? null
                 : revocationServiceProvider.getIfAvailable();
+    }
+
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+            ObjectProvider<TokenRevocationService> revocationProvider, AuthorizationProvider authorizationProvider) {
+        this(jwtTokenProvider, revocationProvider);
+        this.authorizationProvider = authorizationProvider;
     }
 
     /**
@@ -116,7 +123,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // -------------------- 日志：请求进入过滤器 --------------------
         log.debug("JWT 过滤器: {} {}, Authorization={}",
                 request.getMethod(), uri,
-                header == null ? "无" : header.substring(0, Math.min(header.length(), 60)) + "...");
+                header == null ? "无" : "已提供");
 
         // ==================== 2. 解析并校验 Token ====================
         if (header != null && header.startsWith("Bearer ")) {
@@ -141,7 +148,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.debug("JWT 认证成功: userId={}, role={}, uri={}",
                             loginUser.getUserId(), loginUser.getRoleName(), uri);
 
-                    buildAuthentication(request, loginUser);
+                    Long version = claims.get(JwtConstants.CLAIM_AUTH_VERSION, Long.class);
+                    AuthorizationProvider.Authorization authorization = authorizationProvider == null
+                            ? null : authorizationProvider.load(loginUser.getUserId());
+                    if (version == null || authorization == null || !authorization.enabled()
+                            || authorization.version() != version) {
+                        request.setAttribute(JWT_ERROR_STATUS_ATTRIBUTE, ResultStatus.TOKEN_INVALID);
+                    } else {
+                        buildAuthentication(request, loginUser, authorization);
+                    }
                 }
             } catch (ExpiredJwtException e) {
                 // -------------------- 日志：token 已过期 --------------------
@@ -158,8 +173,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } else if (header != null) {
             // -------------------- 日志：Authorization 头格式错误 --------------------
-            log.warn("Authorization 头格式不正确: uri={}, header={}",
-                    uri, header);
+            log.warn("Authorization 头格式不正确: uri={}", uri);
         }
 
         try {
@@ -173,16 +187,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isTokenUsable(Claims claims, LoginUser loginUser) {
         String jti = claims.get(JwtConstants.CLAIM_JTI, String.class);
         Long tokenVersion = claims.get(JwtConstants.CLAIM_TOKEN_VERSION, Long.class);
-        if (tokenRevocationService == null || jti == null || tokenVersion == null
-                || loginUser.getUserId() == null) {
-            return true;
-        }
+        if (jti == null || tokenVersion == null || loginUser.getUserId() == null) return false;
+        if (tokenRevocationService == null) return true;
         return !tokenRevocationService.isRevoked(jti)
                 && tokenRevocationService.getTokenVersion(loginUser.getUserId()) == tokenVersion;
     }
 
-    private void buildAuthentication(HttpServletRequest request, LoginUser loginUser) {
-        List<GrantedAuthority> authorities = buildAuthorities(loginUser.getRoleName());
+    private void buildAuthentication(HttpServletRequest request, LoginUser loginUser,
+            AuthorizationProvider.Authorization authorization) {
+        loginUser.setRoles(authorization.roles());
+        loginUser.setPermissions(authorization.permissions());
+        loginUser.setRoleName(authorization.roles().isEmpty() ? null : authorization.roles().getFirst());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorization.roles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+        authorization.permissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission)));
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(loginUser, null, authorities);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -191,11 +209,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         CurrentUserContext.setLoginUser(loginUser);
     }
 
-    private List<GrantedAuthority> buildAuthorities(String roleName) {
-        if (roleName == null || roleName.isBlank()) {
-            return List.of();
-        }
-        String authority = RoleConstants.ROLE_PREFIX + roleName.trim().toUpperCase(Locale.ROOT);
-        return List.of(new SimpleGrantedAuthority(authority));
-    }
 }

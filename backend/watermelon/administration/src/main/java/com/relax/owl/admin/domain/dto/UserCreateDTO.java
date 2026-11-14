@@ -40,10 +40,8 @@ public class UserCreateDTO {
     @Size(max = 50, message = "昵称长度不能超过50")
     private String nickname;
 
-    @Schema(description = "角色名称，需先在角色管理中创建并启用", example = "ADMIN")
-    @NotBlank(message = "角色名称不能为空")
-    @Size(max = 100, message = "角色名称长度不能超过100")
-    private String roleName;
+    @Schema(description = "角色ID列表；仅超级管理员可以指定，省略时分配USER")
+    private java.util.List<@jakarta.validation.constraints.Positive Long> roleIds;
 
     @Schema(description = "状态：0=正常，1=封禁，不填默认为0", example = "0")
     private Byte status;

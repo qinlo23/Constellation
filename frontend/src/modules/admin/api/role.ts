@@ -6,6 +6,15 @@ const ADMIN_ROLE_BASE_URL = '/admin/role-do'
 
 /** 后台角色管理（要求 ROLE_ADMIN） */
 export const adminRoleApi = {
+  permissions(): Promise<Result<import('@/modules/admin/types').PermissionInfo[]>> {
+    return request.get(`${ADMIN_ROLE_BASE_URL}/permissions`)
+  },
+  rolePermissions(id: number): Promise<Result<string[]>> {
+    return request.get(`${ADMIN_ROLE_BASE_URL}/${id}/permissions`)
+  },
+  replacePermissions(id: number, permissions: string[]): Promise<Result<null>> {
+    return request.put(`${ADMIN_ROLE_BASE_URL}/${id}/permissions`, { permissions })
+  },
   /** 角色列表 — GET /admin/role-do */
   list(): Promise<Result<RoleVO[]>> {
     return request.get(ADMIN_ROLE_BASE_URL)

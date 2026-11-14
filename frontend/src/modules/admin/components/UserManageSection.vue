@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission, hasRole } from '@/core/permission'
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -20,7 +21,7 @@ interface UserForm {
   phone: string
   password: string
   nickname: string
-  roleName: string
+  roleIds: number[]
   status: AdminUserStatus
   remark: string
 }
@@ -39,7 +40,7 @@ const query = reactive<AdminUserQuery>({
   pageSize: 10,
   keyword: '',
   status: undefined,
-  roleName: '',
+  roleId: undefined,
 })
 
 const form = reactive<UserForm>({
@@ -48,7 +49,7 @@ const form = reactive<UserForm>({
   phone: '',
   password: '',
   nickname: '',
-  roleName: '',
+  roleIds: [],
   status: 0,
   remark: '',
 })
@@ -66,11 +67,12 @@ const rules: FormRules<UserForm> = {
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 8, max: 64, message: '密码长度为 8-64 位', trigger: 'blur' },
   ],
-  roleName: [{ required: true, message: '请选择角色', trigger: 'change' }],
+
 }
 
 const loadRoles = async () => {
   try {
+    if (!hasRole('SUPER_ADMIN')) return
     const res = await adminRoleApi.list()
     roles.value = res.data ?? []
   } catch (error) {
@@ -83,7 +85,7 @@ const fetchList = async () => {
   try {
     const params: AdminUserQuery = { ...query }
     if (!params.keyword) delete params.keyword
-    if (!params.roleName) delete params.roleName
+    if (!params.roleId) delete params.roleId
     if (params.status === undefined) delete params.status
     const res = await adminUserApi.list(params)
     list.value = res.data?.records ?? []
@@ -118,7 +120,7 @@ const resetForm = () => {
   form.phone = ''
   form.password = ''
   form.nickname = ''
-  form.roleName = ''
+  form.roleIds = []
   form.status = 0
   form.remark = ''
   formRef.value?.clearValidate()
@@ -136,7 +138,7 @@ const openEdit = (row: AdminUserVO) => {
   form.phone = row.phone ?? ''
   form.password = ''
   form.nickname = row.nickname ?? ''
-  form.roleName = row.roleName
+  form.roleIds = row.roles.map(role => role.id)
   form.status = row.status
   form.remark = row.remark ?? ''
   formRef.value?.clearValidate()
@@ -155,8 +157,7 @@ const submit = async () => {
         email: form.email,
         phone: form.phone || undefined,
         nickname: form.nickname || undefined,
-        roleName: form.roleName,
-        status: form.status,
+        status: hasPermission('user:status') ? form.status : undefined,
         remark: form.remark || undefined,
       }
       await adminUserApi.update(editingId.value, payload)
@@ -168,7 +169,7 @@ const submit = async () => {
         phone: form.phone || undefined,
         password: form.password,
         nickname: form.nickname || undefined,
-        roleName: form.roleName,
+        roleIds: hasRole('SUPER_ADMIN') && form.roleIds.length ? form.roleIds : undefined,
         status: form.status,
         remark: form.remark || undefined,
       }
@@ -242,6 +243,25 @@ const submitResetPassword = async () => {
   }
 }
 
+const assignmentUser = ref<AdminUserVO | null>(null)
+const assignmentIds = ref<number[]>([])
+const assignmentSubmitting = ref(false)
+const openAssignment = (row: AdminUserVO) => {
+  assignmentUser.value = row
+  assignmentIds.value = row.roles.map(role => role.id)
+}
+const saveAssignment = async () => {
+  if (!assignmentUser.value || !assignmentIds.value.length) return
+  assignmentSubmitting.value = true
+  try {
+    await adminUserApi.updateRoles(assignmentUser.value.id, assignmentIds.value)
+    assignmentUser.value = null
+    ElMessage.success('角色已更新，该用户需要重新登录')
+    await fetchList()
+  } catch (error) { ElMessage.error((error as Error).message) }
+  finally { assignmentSubmitting.value = false }
+}
+
 onMounted(() => {
   fetchList()
   loadRoles()
@@ -250,7 +270,7 @@ onMounted(() => {
 
 <template>
   <div class="manage-panel">
-    <AdminPageHeader title="用户管理" subtitle="后台用户查询、创建与状态维护" action-label="新增用户" @action="openCreate" />
+    <AdminPageHeader :show-action="hasPermission('user:create')" title="用户管理" subtitle="后台用户查询、创建与状态维护" action-label="新增用户" @action="openCreate" />
 
     <div class="manage-panel__card">
       <div class="manage-panel__filters">
@@ -266,8 +286,8 @@ onMounted(() => {
           <el-option label="正常" :value="0" />
           <el-option label="封禁" :value="1" />
         </el-select>
-        <el-select v-model="query.roleName" placeholder="角色" clearable class="manage-panel__filter">
-          <el-option v-for="role in roles" :key="role.id" :label="role.roleName" :value="role.roleName" />
+        <el-select v-if="hasRole('SUPER_ADMIN')" v-model="query.roleId" placeholder="角色" clearable class="manage-panel__filter">
+          <el-option v-for="role in roles" :key="role.id" :label="role.roleName" :value="role.id" :disabled="!role.enabled" />
         </el-select>
         <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
       </div>
@@ -280,7 +300,9 @@ onMounted(() => {
           <el-table-column prop="nickname" label="昵称" min-width="120" show-overflow-tooltip />
           <el-table-column prop="phone" label="手机号" min-width="130" show-overflow-tooltip />
           <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
-          <el-table-column prop="roleName" label="角色" min-width="120" show-overflow-tooltip />
+          <el-table-column label="角色" min-width="160">
+            <template #default="{ row }"><el-tag v-for="role in row.roles" :key="role.id">{{ role.roleName }}</el-tag></template>
+          </el-table-column>
           <el-table-column label="状态" width="90">
             <template #default="{ row }">
               <el-tag class="manage-panel__status-tag" :type="row.status === 0 ? 'success' : 'danger'" effect="light">
@@ -291,12 +313,13 @@ onMounted(() => {
           <el-table-column prop="createTime" label="创建时间" min-width="170" show-overflow-tooltip />
           <el-table-column label="操作" width="300" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
-              <el-button link :icon="Key" @click="openResetPassword(row)">重置密码</el-button>
-              <el-button link :type="row.status === 0 ? 'warning' : 'success'" @click="toggleStatus(row)">
+              <el-button v-if="hasRole('SUPER_ADMIN')" link type="primary" @click="openAssignment(row)">分配角色</el-button>
+              <el-button v-permission="'user:update'" link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
+              <el-button v-permission="'user:reset-password'" link :icon="Key" @click="openResetPassword(row)">重置密码</el-button>
+              <el-button v-permission="'user:status'" link :type="row.status === 0 ? 'warning' : 'success'" @click="toggleStatus(row)">
                 {{ row.status === 0 ? '封禁' : '启用' }}
               </el-button>
-              <el-button link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
+              <el-button v-permission="'user:delete'" link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -332,12 +355,12 @@ onMounted(() => {
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="form.nickname" maxlength="50" />
         </el-form-item>
-        <el-form-item label="角色" prop="roleName">
-          <el-select v-model="form.roleName" class="manage-panel__select">
-            <el-option v-for="role in roles" :key="role.id" :label="role.roleName" :value="role.roleName" />
+        <el-form-item v-if="editingId === null && hasRole('SUPER_ADMIN')" label="角色">
+          <el-select v-model="form.roleIds" multiple class="manage-panel__select">
+            <el-option v-for="role in roles" :key="role.id" :label="role.roleName" :value="role.id" :disabled="!role.enabled" />
           </el-select>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item v-if="editingId === null || hasPermission('user:status')" label="状态" prop="status">
           <el-select v-model="form.status" class="manage-panel__select">
             <el-option label="正常" :value="0" />
             <el-option label="封禁" :value="1" />
@@ -354,6 +377,16 @@ onMounted(() => {
       </template>
     </el-dialog>
 
+    <el-dialog :model-value="assignmentUser !== null" title="分配角色" width="min(560px, 92vw)" @close="assignmentUser = null">
+      <p>保存后，该用户的所有会话将失效，需要重新登录。</p>
+      <el-select v-model="assignmentIds" multiple style="width: 100%" placeholder="请选择角色">
+        <el-option v-for="role in roles" :key="role.id" :label="role.roleName" :value="role.id" :disabled="!role.enabled" />
+      </el-select>
+      <template #footer>
+        <el-button @click="assignmentUser = null">取消</el-button>
+        <el-button type="primary" :disabled="!assignmentIds.length" :loading="assignmentSubmitting" @click="saveAssignment">保存</el-button>
+      </template>
+    </el-dialog>
     <el-dialog v-model="passwordDialogVisible" title="重置密码" width="min(480px, 92vw)" destroy-on-close>
       <el-form label-width="96px">
         <el-form-item label="新密码">

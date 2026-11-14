@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission } from '@/core/permission'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
@@ -203,7 +204,7 @@ onMounted(fetchList)
 
 <template>
   <div class="manage-panel">
-    <AdminPageHeader
+    <AdminPageHeader :show-action="hasPermission('hero-video:create')"
       title="Hero 视频管理"
       subtitle="首页主视觉视频维护；启用中排序最靠前的一条会在首页自动播放"
       action-label="新增 Hero 视频"
@@ -232,6 +233,7 @@ onMounted(fetchList)
           <el-table-column label="状态" width="110">
             <template #default="{ row }">
               <el-switch
+                v-permission="'hero-video:status'"
                 :model-value="row.status"
                 :active-value="1"
                 :inactive-value="0"
@@ -243,8 +245,8 @@ onMounted(fetchList)
           <el-table-column label="操作" width="210" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" @click="previewVideo(row)">预览</el-button>
-              <el-button link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
-              <el-button link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
+              <el-button v-permission="'hero-video:update'" link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
+              <el-button v-permission="'hero-video:delete'" link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -318,7 +320,7 @@ onMounted(fetchList)
           <el-input-number v-model="form.sortOrder" :min="0" :max="9999" />
         </el-form-item>
 
-        <el-form-item label="状态">
+        <el-form-item v-if="!isEdit || hasPermission('hero-video:status')" label="状态">
           <el-switch
             v-model="form.status"
             :active-value="1"

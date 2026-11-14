@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission } from '@/core/permission'
 import { computed, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ArrowRight, Bell, Search, Setting, SwitchButton } from '@element-plus/icons-vue'
@@ -13,6 +14,8 @@ const homeMenuExpanded = ref(false)
 const accountDropdownVisible = ref(false)
 const { profileName, profileEmail, profileAvatar, handleLogout } = useAdminDashboard()
 
+const visibleMenu = computed(() => ADMIN_MENU_ITEMS.filter(item => hasPermission(item.permission)))
+const visibleHomeMenu = computed(() => ADMIN_HOME_MENU_GROUP.items.filter(item => hasPermission(item.permission)))
 const activeMenu = computed(() => ALL_ADMIN_MENU_ITEMS.find((item) => item.path === route.path))
 const homeMenuActive = computed(() => ADMIN_HOME_MENU_GROUP.items.some((item) => item.path === route.path))
 
@@ -53,7 +56,7 @@ watch(homeMenuActive, (active) => {
         </button>
 
         <nav class="admin-shell__nav">
-          <RouterLink v-for="item in ADMIN_MENU_ITEMS" :key="item.path" :to="item.path" class="admin-shell__nav-link"
+          <RouterLink v-for="item in visibleMenu" :key="item.path" :to="item.path" class="admin-shell__nav-link"
             :class="{ 'is-active': route.path === item.path }">
             <el-icon>
               <component :is="item.icon" />
@@ -61,7 +64,7 @@ watch(homeMenuActive, (active) => {
             <span class="admin-shell__nav-label">{{ item.label }}</span>
           </RouterLink>
 
-          <div class="admin-shell__nav-group" :class="{ 'is-active': homeMenuActive, 'is-open': homeMenuExpanded }">
+          <div v-if="visibleHomeMenu.length" class="admin-shell__nav-group" :class="{ 'is-active': homeMenuActive, 'is-open': homeMenuExpanded }">
             <button class="admin-shell__nav-link admin-shell__nav-group-trigger" type="button" @click="toggleHomeMenu">
               <el-icon>
                 <component :is="ADMIN_HOME_MENU_GROUP.icon" />
@@ -72,7 +75,7 @@ watch(homeMenuActive, (active) => {
               </el-icon>
             </button>
             <div v-show="homeMenuExpanded && !sidebarCollapsed" class="admin-shell__nav-children">
-              <RouterLink v-for="item in ADMIN_HOME_MENU_GROUP.items" :key="item.path" :to="item.path"
+              <RouterLink v-for="item in visibleHomeMenu" :key="item.path" :to="item.path"
                 class="admin-shell__nav-link admin-shell__nav-child" :class="{ 'is-active': route.path === item.path }">
                 <el-icon>
                   <component :is="item.icon" />
@@ -105,7 +108,7 @@ watch(homeMenuActive, (active) => {
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <RouterLink class="admin-shell__settings-button" to="/admin/dashboard/settings" title="系统设置"
+          <RouterLink v-if="hasPermission('settings:read')" class="admin-shell__settings-button" to="/admin/dashboard/settings" title="系统设置"
             aria-label="系统设置">
             <el-icon>
               <Setting />

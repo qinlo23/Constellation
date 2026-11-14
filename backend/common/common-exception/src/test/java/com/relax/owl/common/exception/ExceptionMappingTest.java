@@ -23,7 +23,7 @@ class ExceptionMappingTest {
             .setControllerAdvice(new GlobalExceptionHandler(), new FallbackExceptionHandler()).build();
         mvc.perform(get("/business")).andExpect(jsonPath("$.code").value(ResultStatus.DATA_ALREADY_EXIST.getCode()));
         mvc.perform(get("/duplicate")).andExpect(jsonPath("$.code").value(ResultStatus.DATA_ALREADY_EXIST.getCode()));
-        mvc.perform(get("/denied")).andExpect(status().isOk()).andExpect(jsonPath("$.code").value(ResultStatus.FORBIDDEN.getCode()));
+        mvc.perform(get("/denied")).andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value(ResultStatus.FORBIDDEN.getCode()));
         mvc.perform(get("/unexpected")).andExpect(jsonPath("$.code").value(ResultStatus.FAIL.getCode()));
     }
 }

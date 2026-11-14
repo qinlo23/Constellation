@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission } from '@/core/permission'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
@@ -176,7 +177,7 @@ onMounted(fetchList)
 
 <template>
   <div class="manage-panel">
-    <AdminPageHeader
+    <AdminPageHeader :show-action="hasPermission('spotlight:create')"
       title="焦点项目管理"
       subtitle="首页焦点项目内容维护"
       action-label="新增焦点项目"
@@ -212,8 +213,8 @@ onMounted(fetchList)
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
-            <el-button link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
+            <el-button v-permission="'spotlight:update'" link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
+            <el-button v-permission="'spotlight:delete'" link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

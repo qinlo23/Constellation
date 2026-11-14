@@ -137,8 +137,13 @@ public class HeroVideoServiceImpl extends ServiceImpl<HeroVideoMapper, HeroVideo
             throw new BizException(ResultStatus.DATA_NOT_EXIST);
         }
 
+        boolean canChangeStatus = com.relax.owl.common.security.PermissionChecks.has("hero-video:status");
+        if (dto.getStatus() != null && !java.util.Objects.equals(dto.getStatus(), existing.getStatus()) && !canChangeStatus)
+            throw new org.springframework.security.access.AccessDeniedException("Missing hero-video:status");
         HeroVideoDO heroVideoDO = heroVideoConvert.DTOConvertDO(dto);
         heroVideoDO.setId(dto.getId());
+        // Omit status for editors without status permission, including concurrent status changes.
+        if (!canChangeStatus) heroVideoDO.setStatus(null);
         // 先继承原对象 key，只有确实传了新文件才覆盖
         heroVideoDO.setVideoUrl(existing.getVideoUrl());
         heroVideoDO.setPosterUrl(existing.getPosterUrl());

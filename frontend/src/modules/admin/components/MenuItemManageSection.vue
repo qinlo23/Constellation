@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPermission } from '@/core/permission'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
@@ -205,7 +206,7 @@ onMounted(fetchList)
 
 <template>
   <div class="manage-panel">
-    <AdminPageHeader
+    <AdminPageHeader :show-action="hasPermission('menu-item:create')"
       title="菜单管理"
       subtitle="前台「LET'S MENU」面板的菜单项；配图存 MinIO，不打包进前端产物"
       action-label="新增菜单项"
@@ -235,6 +236,7 @@ onMounted(fetchList)
           <el-table-column label="状态" width="100">
             <template #default="{ row }">
               <el-switch
+                v-permission="'menu-item:status'"
                 :model-value="row.status"
                 :active-value="1"
                 :inactive-value="0"
@@ -245,8 +247,8 @@ onMounted(fetchList)
           <el-table-column label="操作" width="210" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" @click="previewImage(row)">预览</el-button>
-              <el-button link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
-              <el-button link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
+              <el-button v-permission="'menu-item:update'" link type="primary" :icon="EditPen" @click="openEdit(row)">编辑</el-button>
+              <el-button v-permission="'menu-item:delete'" link type="danger" :icon="Delete" @click="remove(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -335,7 +337,7 @@ onMounted(fetchList)
           <el-input-number v-model="form.sortOrder" :min="0" :max="9999" />
         </el-form-item>
 
-        <el-form-item label="状态">
+        <el-form-item v-if="!isEdit || hasPermission('menu-item:status')" label="状态">
           <el-switch
             v-model="form.status"
             :active-value="1"

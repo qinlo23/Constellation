@@ -29,6 +29,8 @@ public final class JwtConstants {
     /** Claims 中的 token 版本号字段名，用于使旧 token 失效 */
     public static final String CLAIM_TOKEN_VERSION = "tv";
 
+    public static final String CLAIM_AUTH_VERSION = "av";
+
     private JwtConstants() {
     }
 }

@@ -18,7 +18,7 @@ import com.relax.owl.common.result.ResultPage;
  */
 public interface UserAdminService extends IService<UserDO> {
 
-    ResultPage<AdminUserVO> page(long pageNum, long pageSize, String keyword, Byte status, String roleName);
+    ResultPage<AdminUserVO> page(long pageNum, long pageSize, String keyword, Byte status, Long roleId);
 
     AdminUserVO getById(Long id);
 
@@ -30,7 +30,7 @@ public interface UserAdminService extends IService<UserDO> {
 
     Boolean updateStatus(Long id, Byte status);
 
-    Boolean updateRole(Long id, String roleName);
+    void updateRoles(Long id, java.util.List<Long> roleIds);
 
     Boolean resetPassword(Long id, UserPasswordResetDTO resetDTO);
 }

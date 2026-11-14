@@ -65,6 +65,7 @@ public class GlobalExceptionHandler {
      * @param e 权限异常
      * @return 统一响应
      */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(value = org.springframework.security.access.AccessDeniedException.class)
     public Result<?> handleAccessDenied(org.springframework.security.access.AccessDeniedException e) {
         log.warn("权限不足：{}", e.getMessage());

@@ -11,6 +11,8 @@ export const EXAMPLE_PUBLIC_PROFILE_DEFAULTS: UserInfoVO = {
   phone: '110A',
   remark: '默认备注A',
   role: 'UserA',
+  roles: [],
+  permissions: [],
   avatarUrl: projectImageOne as string,
   createTime: '',
 }

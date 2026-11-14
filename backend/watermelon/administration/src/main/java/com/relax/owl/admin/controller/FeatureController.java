@@ -35,6 +35,7 @@ public class FeatureController {
      */
     @GetMapping
     @Operation(summary = "获取前台特性列表",description = "这里只获取四个")
+    @org.springframework.security.access.prepost.PreAuthorize("permitAll()")
     public Result<List<FeatureVO>> list() {
         List<FeatureVO> list = featureService.listByOrder();
         return Result.success(list);
@@ -45,6 +46,7 @@ public class FeatureController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页获取全部特性")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('feature:read')")
     public Result<ResultPage<FeatureVO>> page(
             @RequestParam(defaultValue = "1") long pageNum,
             @RequestParam(defaultValue = "10") long pageSize) {
@@ -56,6 +58,7 @@ public class FeatureController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "获取单条特性")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('feature:read')")
     public Result<FeatureVO> getById(@PathVariable Long id) {
         FeatureVO feature = featureService.getById(id);
         return Result.success(feature);
@@ -66,6 +69,7 @@ public class FeatureController {
      */
     @PostMapping
     @Operation(summary = "新增产品特性")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('feature:create')")
     public Result<Integer> create(@Valid @RequestBody FeatureDTO dto) {
         Integer result = featureService.create(dto);
         return Result.success(result);
@@ -76,6 +80,7 @@ public class FeatureController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "修改产品特性")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('feature:update')")
     public Result<ResultStatus> update(@PathVariable Long id,
                                        @Valid @RequestBody FeatureDTO dto) {
         dto.setId(id);
@@ -92,6 +97,7 @@ public class FeatureController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除产品特性")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('feature:delete')")
     public Result<ResultStatus> delete(@PathVariable Long id) {
         Boolean result = featureService.deleteById(id);
         if(result){

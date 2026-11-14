@@ -37,6 +37,8 @@ const formState = reactive<UserInfoVO>({
   phone: '',
   remark: '',
   role: '',
+  roles: [],
+  permissions: [],
   avatarUrl: '',
   id: 0,
   userCode: '',
@@ -60,6 +62,8 @@ const syncFormState = (profile: UserInfoVO) => {
   formState.email = profile.email
   formState.remark = profile.remark
   formState.phone = profile.phone
+  formState.roles = profile.roles
+  formState.permissions = profile.permissions
   formState.role = profile.role
   formState.avatarUrl = profile.avatarUrl
   formState.id = profile.id

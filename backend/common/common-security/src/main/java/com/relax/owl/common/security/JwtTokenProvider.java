@@ -38,7 +38,7 @@ import static com.relax.owl.common.security.JwtConstants.CLAIM_TOKEN_VERSION;
  *   "userId": 1,
  *   "userCode": "xxx",
  *   "userEmail": "xxx@xx.com",
- *   "role": "ADMIN",
+ *   "role": "SUPER_ADMIN",
  *   "tv": 1,                  // token 版本号，用于批量失效
  *   "iat": 1234567890,
  *   "exp": 1234567890
@@ -67,23 +67,8 @@ public class JwtTokenProvider {
         this.expireTime = expireTime;
     }
 
-    // [TO_BE_DELETED] 旧 token 生成逻辑，请使用带 tokenVersion 的重载。
-    // public String generateToken(Long userId, String userCode, String userEmail, String roleName) {
-    //     long now = System.currentTimeMillis();
-    //     return Jwts.builder()
-    //             .setSubject("login")
-    //             .claim(CLAIM_USER_ID, userId)
-    //             .claim(CLAIM_USER_CODE, userCode)
-    //             .claim(CLAIM_USER_EMAIL, userEmail)
-    //             .claim(CLAIM_ROLE, roleName)
-    //             .setIssuedAt(new Date(now))
-    //             .setExpiration(new Date(now + expireTime))
-    //             .signWith(key, SignatureAlgorithm.HS256)
-    //             .compact();
-    // }
-
     /**
-     * 生成带 jti 与 tokenVersion 的 JWT。
+     * 生成带 jti、tokenVersion 和持久化授权版本的 JWT。
      *
      * <p>jti 用于支持登出时加入黑名单，tokenVersion 用于在修改密码、换绑邮箱等
      * 场景下使该用户此前签发的旧 token 全部失效。</p>
@@ -93,12 +78,12 @@ public class JwtTokenProvider {
      * @param userEmail    用户邮箱
      * @param roleName     角色名
      * @param tokenVersion 当前用户的 token 版本号
+     * @param authVersion 数据库中的授权版本
      * @return 签名后的 JWT 字符串
      */
     public String generateToken(Long userId, String userCode, String userEmail,
-                                String roleName, long tokenVersion) {
+                                String roleName, long tokenVersion, long authVersion) {
         long now = System.currentTimeMillis();
-
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
                 .setSubject("login")
@@ -107,6 +92,7 @@ public class JwtTokenProvider {
                 .claim(CLAIM_USER_EMAIL, userEmail)
                 .claim(CLAIM_ROLE, roleName)
                 .claim(CLAIM_TOKEN_VERSION, tokenVersion)
+                .claim(JwtConstants.CLAIM_AUTH_VERSION, authVersion)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expireTime))
                 .signWith(key, SignatureAlgorithm.HS256)

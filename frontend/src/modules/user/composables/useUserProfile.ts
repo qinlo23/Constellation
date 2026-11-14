@@ -44,6 +44,8 @@ export function useUserProfile() {
       phone: u?.phone ?? examplePublic.phone,
       remark: (u?.remark ?? '').trim() || examplePublic.remark,
       role: u?.role ?? examplePublic.role,
+      roles: u?.roles ?? [],
+      permissions: u?.permissions ?? [],
       avatarUrl: (u?.avatarUrl ?? '').trim() || examplePublic.avatarUrl,
       id: u?.id ?? examplePublic.id,
       userCode: u?.userCode ?? examplePublic.userCode,

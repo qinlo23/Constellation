@@ -17,8 +17,6 @@ import com.relax.owl.admin.domain.entity.UserDO;
 import com.relax.owl.admin.domain.vo.AdminUserVO;
 import com.relax.owl.admin.mapper.UserAdminMapper;
 import com.relax.owl.admin.service.UserAdminService;
-import com.relax.owl.user.domain.entity.RoleDO;
-import com.relax.owl.user.mapper.RoleMapper;
 import com.relax.owl.common.exception.BizException;
 import com.relax.owl.common.result.ResultPage;
 import com.relax.owl.common.result.ResultStatus;
@@ -41,16 +39,17 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
 public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> implements UserAdminService {
 
     private final UserAdminMapper userAdminMapper;
-    private final RoleMapper roleMapper;
+    private final com.relax.owl.user.service.AuthorizationService authorization;
     private final UserAdminConvert userAdminConvert;
     private final PasswordEncoder passwordEncoder;
     private final TokenRevocationService tokenRevocationService;
 
     @Override
-    public ResultPage<AdminUserVO> page(long pageNum, long pageSize, String keyword, Byte status, String roleName) {
+    public ResultPage<AdminUserVO> page(long pageNum, long pageSize, String keyword, Byte status, Long roleId) {
         if (pageNum <= 0) {
             pageNum = 1;
         }
@@ -73,13 +72,14 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
         if (status != null) {
             wrapper.eq(UserDO::getStatus, status);
         }
-        if (roleName != null && !roleName.isBlank()) {
-            wrapper.eq(UserDO::getRoleName, roleName.trim());
+        if (roleId != null) {
+            wrapper.inSql(UserDO::getId, "SELECT user_id FROM user_account_role WHERE role_id=" + roleId);
         }
         wrapper.orderByDesc(UserDO::getCreateTime);
 
         IPage<UserDO> result = userAdminMapper.selectPage(page, wrapper);
         List<AdminUserVO> records = userAdminConvert.toVO(result.getRecords());
+        records.forEach(this::populateRoles);
 
         ResultPage<AdminUserVO> pageResult = new ResultPage<>();
         pageResult.setCurrentPage(result.getCurrent());
@@ -94,6 +94,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     public AdminUserVO getById(Long id) {
         UserDO userDO = requireUser(id);
         AdminUserVO userVO = userAdminConvert.toVO(userDO);
+        populateRoles(userVO);
         return userVO;
     }
 
@@ -116,7 +117,9 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
         if (phone != null && existsByPhone(phone, null)) {
             throw new BizException(ResultStatus.DATA_ALREADY_EXIST);
         }
-        RoleDO roleDO = requireEnabledRole(createDTO.getRoleName());
+        authorization.lock();
+        boolean superAdmin = com.relax.owl.common.security.PermissionChecks.has("ROLE_SUPER_ADMIN");
+        if (createDTO.getRoleIds() != null && !superAdmin) throw new org.springframework.security.access.AccessDeniedException("Only SUPER_ADMIN may assign roles");
         validateStatus(createDTO.getStatus());
 
         UserDO userDO = new UserDO();
@@ -128,20 +131,24 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
         userDO.setNickname(createDTO.getNickname() == null || createDTO.getNickname().isBlank()
                 ? username
                 : createDTO.getNickname().trim());
-        userDO.setRoleName(roleDO.getRoleName());
+        userDO.setAuthVersion(0L);
         userDO.setStatus(createDTO.getStatus() == null ? 0 : createDTO.getStatus());
         userDO.setRemark(createDTO.getRemark());
         userDO.setCreateTime(LocalDateTime.now());
         userDO.setUpdateTime(LocalDateTime.now());
 
         userAdminMapper.insert(userDO);
+        if (createDTO.getRoleIds() == null) authorization.initializeDefaultRole(userDO.getId());
+        else authorization.replaceRoles(userDO.getId(), createDTO.getRoleIds());
         return userDO.getId();
     }
 
     @Override
     @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "更新用户")
     public Boolean update(Long id, UserUpdateDTO updateDTO) {
+        authorization.lock();
         requireUser(id);
+        authorization.guardAccountMutation(id);
 
         LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(UserDO::getId, id);
@@ -180,12 +187,10 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
             wrapper.set(UserDO::getRemark, updateDTO.getRemark().trim());
             changed = true;
         }
-        if (updateDTO.getRoleName() != null && !updateDTO.getRoleName().isBlank()) {
-            RoleDO roleDO = requireEnabledRole(updateDTO.getRoleName());
-            wrapper.set(UserDO::getRoleName, roleDO.getRoleName());
-            changed = true;
-        }
         if (updateDTO.getStatus() != null) {
+            com.relax.owl.common.security.PermissionChecks.require("user:status");
+            if (updateDTO.getStatus() != 0) authorization.protectLastSuperAdmin(id);
+            if (!updateDTO.getStatus().equals(requireUser(id).getStatus())) authorization.bumpUser(id);
             validateStatus(updateDTO.getStatus());
             wrapper.set(UserDO::getStatus, updateDTO.getStatus());
             changed = true;
@@ -197,15 +202,22 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     @Override
     @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "删除用户")
     public Boolean deleteById(Long id) {
+        authorization.lock();
         requireUser(id);
+        authorization.guardAccountMutation(id);
+        authorization.protectLastSuperAdmin(id);
         return userAdminMapper.deleteById(id) > 0;
     }
 
     @Override
     @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "封禁/解封用户")
     public Boolean updateStatus(Long id, Byte status) {
+        authorization.lock();
         requireUser(id);
+        authorization.guardAccountMutation(id);
         validateStatus(status);
+        if (status != 0) authorization.protectLastSuperAdmin(id);
+        authorization.bumpUser(id);
 
         LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(UserDO::getId, id).set(UserDO::getStatus, status);
@@ -213,20 +225,17 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
     }
 
     @Override
-    @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "修改用户角色")
-    public Boolean updateRole(Long id, String roleName) {
-        requireUser(id);
-        RoleDO roleDO = requireEnabledRole(roleName);
-
-        LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(UserDO::getId, id).set(UserDO::getRoleName, roleDO.getRoleName());
-        return userAdminMapper.update(null, wrapper) > 0;
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('SUPER_ADMIN')")
+    public void updateRoles(Long id, java.util.List<Long> roleIds) {
+        authorization.replaceRoles(id, roleIds);
     }
 
     @Override
     @OperationLog(type = LogType.ADMIN, module = "用户管理", action = "重置用户密码")
     public Boolean resetPassword(Long id, UserPasswordResetDTO resetDTO) {
+        authorization.lock();
         requireUser(id);
+        authorization.guardAccountMutation(id);
         validatePassword(resetDTO.getNewPassword());
 
         LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
@@ -247,16 +256,12 @@ public class UserAdminServiceImpl extends ServiceImpl<UserAdminMapper, UserDO> i
         return userDO;
     }
 
-    private RoleDO requireEnabledRole(String roleName) {
-        if (roleName == null || roleName.isBlank()) {
-            throw new BizException(ResultStatus.ROLE_FAILED);
-        }
-        RoleDO roleDO = roleMapper.selectOne(
-                Wrappers.<RoleDO>lambdaQuery().eq(RoleDO::getRoleName, roleName.trim()));
-        if (roleDO == null || !Boolean.TRUE.equals(roleDO.getEnabled())) {
-            throw new BizException(ResultStatus.ROLE_FAILED);
-        }
-        return roleDO;
+    private void populateRoles(AdminUserVO user) {
+        user.setRoles(authorization.roles(user.getId()).stream().map(role -> {
+            var info = new com.relax.owl.user.domain.vo.RoleInfo();
+            org.springframework.beans.BeanUtils.copyProperties(role, info);
+            return info;
+        }).toList());
     }
 
     private boolean existsByUsername(String username, Long excludeId) {

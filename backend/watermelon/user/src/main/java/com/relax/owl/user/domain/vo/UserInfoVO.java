@@ -50,6 +50,8 @@ public class UserInfoVO {
 
     @Schema(description = "角色",example = "user")
     private String role;
+    private java.util.List<String> roles;
+    private java.util.List<String> permissions;
 
     @Schema(description = "头像URL")
     private String avatarUrl;
