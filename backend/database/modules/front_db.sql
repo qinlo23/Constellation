@@ -1,5 +1,7 @@
+USE owl;
+
 -- ======================================================
--- OWL 数据库：admin 模块 canonical DDL
+-- owl 数据库：admin 模块 canonical DDL
 -- 模块：admin
 -- MySQL 版本：8.4
 -- 说明：首页展示配置由 admin 模块维护。

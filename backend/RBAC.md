@@ -27,17 +27,15 @@
 | `GET /api/admin/role-do/{id}/permissions` | 已分配的权限编码列表 |
 | `PUT /api/admin/role-do/{id}/permissions` | `{ "permissions": ["feature:read"] }`，整体替换，空列表清空授权 |
 
-旧的 `/user-do/{id}/role` 已移除。角色返回值增加 `roleCode` 和 `builtIn`。当前基线的权限目录见 `database/modules/user_permission_seed.sql`，其中 28 项与当前初始化脚本、历史增量迁移一致；后续权限目录变更统一新增到 `database/version/`，不修改基线或历史版本；角色管理入口由 SUPER_ADMIN 身份决定，不开放可委派的角色管理权限。
+旧的 `/user-do/{id}/role` 已移除。角色返回值增加 `roleCode` 和 `builtIn`。当前基线的权限目录见 `database/modules/user_init_data.sql`，其中包含当前 28 项权限目录；后续权限目录变更统一新增到 `database/version/`，不修改基线或历史版本；角色管理入口由 SUPER_ADMIN 身份决定，不开放可委派的角色管理权限。
 
-## 发布与回退
+## 新库初始化与发布
 
-1. 进入维护窗口，停止旧版本写入，备份整个 OWL 数据库并保留旧版本应用制品。
-2. 对 RBAC 改造前的旧库执行 `database/version/20261114_user_rbac.sql`，使用 MySQL 客户端批处理，**不要使用 `--force`**。预检会输出孤立角色账号并中止；还要求存在有效 ADMIN 和启用的 USER 角色。
-3. 脚本将 ADMIN 映射为 SUPER_ADMIN、USER 保留 USER，其他角色生成 `CUSTOM_<旧ID>`，保留展示名称；回填并核对账户角色数量后移除旧账户 `role_name`。自定义角色不自动获得权限。
-4. 同时部署新后端与前端。所有旧登录态都需要重新登录，随后由超级管理员配置自定义角色权限。
-5. 检查管理员登录、角色分配、只读角色、公开列表和普通用户个人业务；观察结构化授权日志及 401/403。
+1. 从仓库根目录进入 `backend/database/`，执行 `mysql -h 127.0.0.1 -u root -p < init.sql`；也可按数据库 README 顺序执行 `modules/` 中的 SQL，先运行 `00_schema.sql`。
+2. `user_db.sql` 已直接创建完整 RBAC 结构；`user_init_data.sql` 写入内置角色、示例账号关系和 28 项权限，无需历史角色回填脚本。旧 `20261114_user_rbac.sql` 已归档，不作为新库初始化或现有环境升级入口。
+3. 将实际 JDBC 配置的 schema 设为 `owl`，部署后端与前端，验证管理员登录、角色分配、只读角色和普通用户业务；观察授权日志及 401/403。
 
-MySQL DDL 会自动提交。本脚本仅执行一次，不能通过外层事务整体回滚；出现中途错误或需要回退时，保持维护状态，恢复数据库备份与旧应用，不能在部分迁移库上直接重跑脚本。新建库执行 `database/modules/` 中固定的 `user_db.sql` 和 `user_init_data.sql`，再执行适用于该基线的后续增量版本。当前基线已包含 RBAC，不重复执行 `20261114_user_rbac.sql`；Docker 初始化副本保持基线用途。数据库维护规则见 [数据库维护规则](database/AGENTS.md)。
+该入口面向全新数据库，不清空现有表，不迁移原 `OWL` 库的数据。现有环境的结构或数据调整应另行新增适用的版本脚本。数据库维护规则见 [数据库维护规则](database/AGENTS.md)。
 
 ## 验证
 

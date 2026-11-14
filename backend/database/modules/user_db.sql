@@ -1,9 +1,12 @@
+USE owl;
+
 -- ======================================================
--- OWL 数据库：user 模块 canonical DDL
+-- owl 数据库：user 模块 canonical DDL
 -- 模块：user
 -- MySQL 版本：8.4
 -- 说明：user_role / user_account / user_address 由 user 模块维护，
---       api 与 administration 复用 user_role 表。
+--       admin 复用 user_role 表。
+-- RBAC 已直接纳入基线：角色编码、内置角色、授权版本、权限目录及多对多关系。
 -- 初始账号：数据由 user_init_data.sql 写入，库中存 BCrypt 哈希，明文密码对应如下
 --   admin    / admin123       -> ADMIN
 --   merchant / merchant123    -> MERCHANT

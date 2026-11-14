@@ -1,5 +1,7 @@
+USE owl;
+
 -- ======================================================
--- OWL 数据库：caishen 模块 canonical DDL
+-- owl 数据库：caishen 模块 canonical DDL
 -- 模块：caishen（理财中心，代号 caishen）
 -- MySQL 版本：8.4
 -- 说明：V1 基金监控与提醒。基金档案 / 净值历史 / 用户关注 /

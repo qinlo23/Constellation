@@ -26,7 +26,7 @@ public class CodeGenerator {
                 .getParent().getParent().toString();
 
         FastAutoGenerator.create(
-                        "jdbc:mysql://localhost:3306/pitaya?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8",
+                        "jdbc:mysql://localhost:3306/owl?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8",
                         "root",
                         "123456qin"
                 )
