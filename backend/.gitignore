@@ -3,7 +3,7 @@
 **/target/
 
 # IDEs
-/.idea/
+.idea/
 .vscode/
 
 # Build folders from other tools
