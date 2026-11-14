@@ -44,7 +44,7 @@ start 的 POM 显式组装业务、所需公共模块和 Nacos Config/Discovery�
 
 ## 中间件与历史模块
 
-Redis、RabbitMQ、MinIO 独立引入，不通过 common-infra 打包。订单等业务队列及常量由对应业务拥有。Guava 进程内布隆过滤器归 sugarcane，不与 Redis 捆绑。MinIO、邮件等模块仍需要对应配置和外部服务，模块独立不代表可脱离运行条件。
+Redis、RabbitMQ、MinIO 独立引入，不通过 common-infra 打包。订单等业务队列及常量由对应业务拥有。Guava 进程内布隆过滤器归 price，不与 Redis 捆绑。MinIO、邮件等模块仍需要对应配置和外部服务，模块独立不代表可脱离运行条件。
 
 mango、pitaya 保持未纳入 reactor 的历史状态，不在本次重构中恢复。无需升级依赖版本或修改数据库结构。
 

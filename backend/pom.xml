@@ -20,7 +20,7 @@
     <modules>
         <module>common</module>
         <module>start</module>
-        <module>watermelon</module>
+        <module>business</module>
     </modules>
 
 
@@ -112,22 +112,22 @@
 
             <dependency>
                 <groupId>com.relax</groupId>
-                <artifactId>watermelon</artifactId>
+                <artifactId>business</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.relax</groupId>
-                <artifactId>sugarcane</artifactId>
+                <artifactId>price</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.relax</groupId>
-                <artifactId>crow</artifactId>
+                <artifactId>ai</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.relax</groupId>
-                <artifactId>administration</artifactId>
+                <artifactId>admin</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

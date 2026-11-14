@@ -24,11 +24,11 @@
         </dependency>
         <dependency>
             <groupId>com.relax</groupId>
-            <artifactId>administration</artifactId>
+            <artifactId>admin</artifactId>
         </dependency>
         <dependency>
             <groupId>com.relax</groupId>
-            <artifactId>crow</artifactId>
+            <artifactId>ai</artifactId>
         </dependency>
         <dependency>
             <groupId>com.relax</groupId>
@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.relax</groupId>
-            <artifactId>sugarcane</artifactId>
+            <artifactId>price</artifactId>
         </dependency>
         <dependency>
             <groupId>com.relax</groupId>

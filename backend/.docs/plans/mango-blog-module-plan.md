@@ -146,7 +146,7 @@ user_account ||--o{ blog_post : "作者"
 ## 模块代码结构
 
 ```text
-watermelon/mango/src/main/java/xyz/nanian/owl/mango/
+business/mango/src/main/java/xyz/nanian/owl/mango/
 ├── config/             # 模块私有配置（如无需，可省略）
 ├── constant/           # 模块常量（lang、默认分页、排序）
 ├── controller/         # PostController, CategoryController, TagController,
@@ -430,7 +430,7 @@ watermelon/mango/src/main/java/xyz/nanian/owl/mango/
 | 1.3  | 文章 CRUD 接口（6 个）                                                                                 | Controller + Service + Mapper |
 | 1.4  | 分类 CRUD 接口（4 个）                                                                                 | Controller + Service + Mapper |
 | 1.5  | 标签 CRUD 接口（4 个，含 PUT）                                                                         | Controller + Service + Mapper |
-| 1.6  | 验证 `mvn compile -pl watermelon/mango -am` 与 `mvn test`                                              | 编译/测试通过                 |
+| 1.6  | 验证 `mvn compile -pl business/mango -am` 与 `mvn test`                                              | 编译/测试通过                 |
 
 ### 阶段 2：个人信息（P1）
 

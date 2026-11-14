@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.relax.owl.user.mapper.UserMapper">
+
+    <!-- [TO_BE_DELETED] 空实现，用户搜索后续交给 admin 模块 -->
+    <!--
+    <select id="selectUserByName" resultType="entity.domain.user.com.relax.owl.UserDO">
+    </select>
+    -->
+</mapper>

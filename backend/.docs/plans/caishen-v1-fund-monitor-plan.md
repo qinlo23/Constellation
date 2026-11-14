@@ -30,7 +30,7 @@ OWL 理财模块代号 caishen，此前 [ADR-005](../adr/ADR-005-财神理财模
 
 | 项目             | 值                       |
 | ---------------- | ------------------------ |
-| 模块目录         | `watermelon/caishen`     |
+| 模块目录         | `business/caishen`     |
 | Maven artifactId | `caishen`                |
 | 基础包           | `xyz.nanian.owl.caishen` |
 | 接口前缀         | `/api/caishen`           |
@@ -248,7 +248,7 @@ user_account ||--o{ caishen_summary : "总结"
 ## 模块代码结构
 
 ```text
-watermelon/caishen/
+business/caishen/
   src/main/java/xyz/nanian/owl/caishen/
     config/
       CaishenConfig.java              # 模块配置属性（调度频率、AI provider 等）
@@ -355,7 +355,7 @@ public interface AssetAnalysisClient {
 }
 ```
 
-- V1 实现：`SpringAiAssetAnalysisClient`（复用 crow 模块已有的 Spring AI 基础设施）或 `MockAssetAnalysisClient`。
+- V1 实现：`SpringAiAssetAnalysisClient`（复用 ai 模块已有的 Spring AI 基础设施）或 `MockAssetAnalysisClient`。
 - 配置项：`caishen.analysis.provider=spring-ai|mock`。
 
 ### 邮件发送
@@ -523,9 +523,9 @@ caishen:
 
 ### 阶段 1：模块骨架
 
-- 创建 `watermelon/caishen` 目录、`pom.xml` 和基础包。
+- 创建 `business/caishen` 目录、`pom.xml` 和基础包。
 - 注册根 pom、start pom、Springdoc 分组。
-- 验证 `mvn compile -pl watermelon/caishen -am`。
+- 验证 `mvn compile -pl business/caishen -am`。
 
 ### 阶段 2：数据库与实体
 
@@ -570,7 +570,7 @@ caishen:
 - 启动 start 模块，验证 `/doc.html` 和 caishen 分组。
 - 手动触发净值同步，验证阈值检查和邮件发送。
 - 手动触发总结生成，验证 AI 调用和邮件发送。
-- 执行 `mvn test -pl watermelon/caishen -am`。
+- 执行 `mvn test -pl business/caishen -am`。
 
 ## 与旧方案的关系
 
