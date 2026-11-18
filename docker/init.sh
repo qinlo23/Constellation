@@ -7,22 +7,22 @@ docker compose up -d
 cd ..
 
 
-cd ./redis-owl
+cd ./redis
 docker compose up -d
 cd ..
 
 
-cd ./nacos-owl
+cd ./nacos
 docker compose up -d
 cd ..
 
 
-cd ./minio-owl
+cd ./minio
 docker compose up -d
 cd ..
 
 
-cd ./mysql-owl
+cd ./mysql
 docker compose up -d
 cd ..
 

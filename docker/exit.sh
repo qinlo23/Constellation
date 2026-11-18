@@ -1,26 +1,26 @@
 #!/bin/bash
 
-cd ./rabbitmq-owl
+cd ./rabbitmq
 docker compose down
 cd ..
 
 
-cd ./redis-owl
+cd ./redis
 docker compose down
 cd ..
 
 
-cd ./nacos-owl
+cd ./nacos
 docker compose down
 cd ..
 
 
-cd ./minio-owl
+cd ./minio
 docker compose down
 cd ..
 
 
-cd ./mysql-owl
+cd ./mysql
 docker compose down
 cd ..
 
