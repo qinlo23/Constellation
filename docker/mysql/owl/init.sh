@@ -7,7 +7,7 @@
 #   /docker-entrypoint-initdb.d/ 顶层 *.sh / *.sql(按字母序,
 #   不递归子目录,每个 .sql 独立会话执行)。
 #   因此:顶层 init.sql 只负责建库;本脚本负责按依赖顺序把
-#   子目录中的模块脚本逐个执行(全部落在 owl 库)。
+#   子目录中的模块脚本逐个执行(全部落在 OWL 库)。
 #   之后 init.sql 仍会被 entrypoint 单独跑一次,其内容为
 #   CREATE DATABASE IF NOT EXISTS + USE,幂等,无副作用。
 # ==============================================================
@@ -15,7 +15,7 @@ set -e
 
 mysql=( mysql --protocol=socket -uroot -hlocalhost --socket=/var/run/mysqld/mysqld.sock -p"${MYSQL_ROOT_PASSWORD}" )
 
-echo "[OWL-init] create database owl"
+echo "[OWL-init] create database OWL"
 "${mysql[@]}" < /docker-entrypoint-initdb.d/init.sql
 
 # 模块脚本执行顺序(含依赖关系):
@@ -42,7 +42,7 @@ for rel in "${files[@]}"; do
         continue
     fi
     echo "[OWL-init] applying ${rel}"
-    "${mysql[@]}" --database=owl < "$f"
+    "${mysql[@]}" --database=OWL < "$f"
 done
 
 echo "[OWL-init] done"

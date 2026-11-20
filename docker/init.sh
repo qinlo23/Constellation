@@ -1,5 +1,6 @@
 #!/bin/bash
 	
+# for owl project 
 
 cd ./rabbitmq
 docker compose up -d
