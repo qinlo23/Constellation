@@ -1,6 +1,0 @@
-## 生产环境要设置的，
-#springdoc:
-#  api-docs:
-#    enabled: false
-#  swagger-ui:
-#    enabled: false

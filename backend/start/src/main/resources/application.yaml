@@ -11,7 +11,7 @@ spring:
 
   cloud:
     nacos:
-      server-addr: 192.168.0.43:8848
+      server-addr: 192.168.166.128:8848
       username: nacos
       password: nacos
-      namespace: OWL
+      namespace: public
